@@ -13,7 +13,6 @@
         .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         label { font-weight: bold; display: block; margin-top: 15px; color: #00bfa5; font-size: 14px; }
         input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #333; background: #1a1a1a; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        input::placeholder { color: #555; font-style: italic; }
         
         /* Scorecard Badge Styling */
         .score-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; margin-top: 5px; background: #222; border: 1px solid #333; color: #aaa; }
@@ -55,10 +54,7 @@
     </style>
 
     <script>
-        // Supabase Live Data Integration
-        const SUPABASE_URL = "https://kzlheeoaxpnhdieirijx.supabase.co"; 
-        const SUPABASE_KEY = "sb_publishable_eZU2aoe2ECno_ONAtgqRnA_zWXotlHC";
-
+        // --- REMOVED LIVE SUPABASE NETWORK REQUEST DEPENDENCIES FOR FULL OFFLINE STABILITY ---
         let deviceID = localStorage.getItem('medSidekickDeviceID') || "User_" + Math.random().toString(36).substring(2, 7).toUpperCase();
         localStorage.setItem('medSidekickDeviceID', deviceID);
 
@@ -71,7 +67,10 @@
         window.snoozeAlarm = snoozeAlarm;
         window.generateReport = generateReport;
 
-        // --- 1. TYPEWRITER ANIMATION LOOP ---
+        // Web Audio Synthesizer Engine to bypass device hardware restrictions while active
+        let audioCtx = null;
+        let alarmIntervalInstance = null;
+
         const brand = "MedSidekick...";
         let charIdx = 0;
         function typeEffect() {
@@ -94,7 +93,7 @@
                 document.getElementById("permissionsScreen").style.display = "block";
             } else {
                 document.getElementById("mainApp").style.display = "block";
-                syncLocalAndCloud();
+                syncLocalDataOnly();
             }
         }
 
@@ -102,11 +101,11 @@
             localStorage.setItem('medSidekickPermissionsGranted', 'true');
             document.getElementById("permissionsScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
-            syncLocalAndCloud();
+            syncLocalDataOnly();
             showToast("Secure access granted! Welcome aboard 🌟", "#00bfa5");
         }
 
-        // --- 2. BUSINESS LOGIC ENGINE ---
+        // --- CORE LOCAL MEMORY LOGIC FRAMEWORK ---
         let schedule = JSON.parse(localStorage.getItem('medData')) || [];
         let missedCounter = parseInt(localStorage.getItem('missedDoses')) || 0;
         let totalTaken = parseInt(localStorage.getItem('metricsTotalTaken')) || 0;
@@ -115,9 +114,18 @@
         let lastAlert = "";
         let snoozeTimeout = null;
 
+        // PRIORITY 3: Fully Functional Discretion Mode Switching UX
         function toggleDiscretionMode() {
             const isChecked = document.getElementById('discretionToggle').checked;
-            document.getElementById('aliasDiv').style.display = isChecked ? "block" : "none";
+            const medInput = document.getElementById('medName');
+            
+            if (isChecked) {
+                document.getElementById('aliasDiv').style.display = "block";
+                medInput.placeholder = "e.g. Strategic Masking Alias (e.g., Layer A-1)";
+            } else {
+                document.getElementById('aliasDiv').style.display = "none";
+                medInput.placeholder = "e.g. Paracetamol";
+            }
         }
 
         function calculateComplianceRate() {
@@ -126,51 +134,27 @@
             return Math.round((totalTaken / total) * 100);
         }
 
-        async function syncMetricsToCloud() {
-            const pName = document.getElementById('patientName').value || localStorage.getItem('lastPatient') || "";
-            const payload = {
-                user_id: `${pName || 'Patient'}_${deviceID}`,
-                active_loops: schedule.length,
-                gross_compliance: calculateComplianceRate(),
-                current_streak: currentStreak,
-                last_active: new Date().toISOString()
-            };
-
-            try {
-                await fetch(`${SUPABASE_URL}/rest/v1/user_adherence_metrics`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'resolution=merge-duplicates'
-                    },
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {
-                console.log("Offline pipeline active.");
-            }
-        }
-
-        async function syncLocalAndCloud() {
+        // Replaced Supabase function with completely isolated Local Analytics tracking
+        function syncLocalDataOnly() {
             const pName = localStorage.getItem('lastPatient') || "";
             document.getElementById('patientName').value = pName;
             renderMeds();
             loadICE();
             updateScorecardDisplay();
-            syncMetricsToCloud();
         }
 
-        async function saveMed() {
+        // PRIORITY 1: 100% Offline Data Saving Engine via LocalStorage Cache
+        function saveMed() {
             const realName = document.getElementById('medName').value;
             const time = document.getElementById('medTime').value;
             const strength = document.getElementById('medStrength').value || "500mg";
             const isDiscreet = document.getElementById('discretionToggle').checked;
             const aliasName = document.getElementById('medAlias').value || "Routine Shield";
-            const pName = document.getElementById('patientName').value || "";
+            const pName = document.getElementById('patientName').value || "Patient";
 
             if (!realName || !time) return showToast("Fill in Name and Time", "#b71c1c");
 
+            // Complete masking logic assignment
             const displayName = isDiscreet ? aliasName : realName;
 
             const entry = { 
@@ -183,19 +167,22 @@
             
             schedule.push(entry);
             localStorage.setItem('medData', JSON.stringify(schedule));
-            if(pName) localStorage.setItem('lastPatient', pName);
+            localStorage.setItem('lastPatient', pName);
             renderMeds();
 
             showToast("Saved securely in localized vault! 🔒", "#008080");
-            await syncMetricsToCloud();
+            updateScorecardDisplay();
             
-            speechSynthesis.speak(new SpeechSynthesisUtterance("Regimen mapped for " + displayName));
+            try {
+                speechSynthesis.speak(new SpeechSynthesisUtterance("Regimen mapped for " + displayName));
+            } catch(e) {}
             
             document.getElementById('medName').value = "";
-            document.getElementById('medStrength').value = "";
+            document.getElementById('medStrength').value = "500mg";
             document.getElementById('medTime').value = "";
             document.getElementById('discretionToggle').checked = false;
             document.getElementById('aliasDiv').style.display = "none";
+            document.getElementById('medName').placeholder = "e.g. Paracetamol";
         }
 
         function renderMeds() {
@@ -213,21 +200,21 @@
             });
         }
 
-        async function removeMed(index) {
+        function removeMed(index) {
             schedule.splice(index, 1);
             localStorage.setItem('medData', JSON.stringify(schedule));
             renderMeds();
             showToast("Regimen updated successfully.", "#333");
-            await syncMetricsToCloud();
+            updateScorecardDisplay();
         }
 
         function saveICE() {
-            const name = document.getElementById('iceName').value;
+            const name = document.getElementById('iceName').value || "Lisa";
             const phone = document.getElementById('icePhone').value;
             if (!phone) return showToast("Fill in contact phone number!", "#b71c1c");
             localStorage.setItem('iceData', JSON.stringify({ name, phone }));
             showToast("ICE safety mesh armed!", "#c62828");
-            document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${name || 'Emergency Support'}</b>`;
+            document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${name}</b>`;
             document.getElementById('iceActiveBadge').style.display = "block";
         }
 
@@ -236,12 +223,12 @@
             if (savedICE) {
                 document.getElementById('iceName').value = savedICE.name;
                 document.getElementById('icePhone').value = savedICE.phone;
-                document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${savedICE.name || 'Emergency Support'}</b>`;
+                document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${savedICE.name}</b>`;
                 document.getElementById('iceActiveBadge').style.display = "block";
             }
         }
 
-        // Clock Check Heartbeat (Runs entirely hidden until dose time match)
+        // PRIORITY 2: Foreground Clock Reminders & Audio Alert Pipeline
         setInterval(() => {
             const now = new Date();
             const clock = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
@@ -253,12 +240,44 @@
                     }
                 });
             }
-        }, 5000);
+        }, 3000);
+
+        function playWebAlarmSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (alarmIntervalInstance) clearInterval(alarmIntervalInstance);
+                
+                alarmIntervalInstance = setInterval(() => {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Sharp high pitch beep
+                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                }, 400);
+            } catch(e) { console.log("Audio contexts pending interaction."); }
+        }
+
+        function stopWebAlarmSound() {
+            if (alarmIntervalInstance) {
+                clearInterval(alarmIntervalInstance);
+                alarmIntervalInstance = null;
+            }
+        }
 
         function triggerAlarm(name, strength, isDiscreet) {
             if (snoozeTimeout) clearTimeout(snoozeTimeout);
             const pName = document.getElementById('patientName').value || "Patient";
-            speechSynthesis.speak(new SpeechSynthesisUtterance("Attention " + pName + ", time for your scheduled " + name));
+            
+            try {
+                speechSynthesis.speak(new SpeechSynthesisUtterance("Attention " + pName + ", time for your scheduled routine."));
+            } catch(e) {}
+            
+            playWebAlarmSound();
+            
             document.getElementById('alarmDetails').innerText = name + " (" + strength + ")";
             document.getElementById('alarmBox').style.display = "block";
             document.getElementById('alarmBox').dataset.isDiscreet = isDiscreet;
@@ -271,6 +290,7 @@
             const strength = document.getElementById('alarmBox').dataset.currentStrength;
             const isDiscreet = document.getElementById('alarmBox').dataset.isDiscreet;
             
+            stopWebAlarmSound();
             document.getElementById('alarmBox').style.display = "none";
             showToast("⏰ Smart Snooze initialized. Ringing again in 15 minutes.", "#fbc02d");
             
@@ -279,7 +299,8 @@
             }, 15 * 60 * 1000); 
         }
 
-        async function doseAction(taken) {
+        function doseAction(taken) {
+            stopWebAlarmSound();
             const isDiscreet = document.getElementById('alarmBox').dataset.isDiscreet === "true";
             document.getElementById('alarmBox').style.display = "none";
             const pName = document.getElementById('patientName').value || "Patient";
@@ -308,6 +329,7 @@
                 totalSkipped++;
                 localStorage.setItem('metricsTotalSkipped', totalSkipped);
                 
+                // PRIORITY 4: Semi-Automated Intent Routing Pattern
                 if (missedCounter >= 3) {
                     currentStreak = 0;
                     localStorage.setItem('metricsCurrentStreak', currentStreak);
@@ -315,15 +337,19 @@
 
                     if (isDiscreet) {
                         showToast("🔒 Max misses reached. Secure local protocol activated.", "#fbc02d");
-                        alert("Confidential Warning: 3 consecutive doses missed. Please contact your clinician directly. Caregiver routing suspended for privacy.");
+                        alert("Confidential Privacy System Warning: 3 consecutive doses have been missed. Due to your active Discretion Settings, automated SMS notifications are restricted to maintain patient confidentiality. Please contact your consultant panel directly.");
                         missedCounter = 0;
                         localStorage.setItem('missedDoses', 0);
                     } else {
-                        showToast("Sending warm alert to emergency fallback network...", "#b71c1c");
+                        showToast("Bypassing sandbox to load message payload...", "#b71c1c");
                         const savedICE = JSON.parse(localStorage.getItem('iceData'));
                         if (savedICE && savedICE.phone) {
                             const msg = `Hello! This is a friendly care update from MedSidekick. 🌟 ${pName} hasn't logged their routine medication for a few slots today. Could you kindly reach out, give them a warm call, or check in on them to make sure they are doing great? Thank you for being an amazing support system! ❤️`;
+                            
+                            // Bypasses core runtime to throw open native dialer message framework seamlessly
                             window.location.href = `sms:${savedICE.phone}?body=${encodeURIComponent(msg)}`;
+                        } else {
+                            alert("Warning: 3 doses missed, but no Emergency Contact Number was saved to deploy payload.");
                         }
                         missedCounter = 0;
                         localStorage.setItem('missedDoses', 0);
@@ -334,7 +360,6 @@
             }
             
             updateScorecardDisplay();
-            await syncMetricsToCloud();
         }
 
         function updateScorecardDisplay() {
@@ -416,6 +441,17 @@
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
+
+        // Quick simulation helper function for presentations
+        function debugForceAlarmTrigger() {
+            if (schedule.length === 0) {
+                triggerAlarm("Demo Shield Alpha", "300mg", true);
+            } else {
+                triggerAlarm(schedule[0].name, schedule[0].strength, schedule[0].isDiscreet);
+            }
+            showToast("Presentation sandbox alarm fired! ⚡", "#00bfa5");
+        }
+        window.debugForceAlarmTrigger = debugForceAlarmTrigger;
     </script>
 </head>
 <body>
@@ -430,8 +466,8 @@
             <p style="line-height: 1.6; color: #ddd; font-size: 15px;">To help ensure maximum therapeutic compliance and log vital safety parameters, our ecosystem requires your permission to access the following data:</p>
             
             <div style="text-align: left; background: #1a1a1a; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #333;">
-                <p style="margin: 5px 0; font-size: 14px;">📊 <b>Anonymized Adherence Data:</b> Syncs schedule counts with our cloud backend dashboard for clinical analysis.</p>
-                <p style="margin: 15px 0 5px 0; font-size: 14px;">💬 <b>Emergency SMS Routing:</b> Allows the device to draft supportive care texts to your emergency line if needed.</p>
+                <p style="margin: 5px 0; font-size: 14px;">📊 <b>Anonymized Adherence Data:</b> Track internal trends dynamically to optimize treatment outcomes.</p>
+                <p style="margin: 15px 0 5px 0; font-size: 14px;">💬 <b>Emergency SMS Routing:</b> Pre-format critical safety text warnings to support groups instantly.</p>
             </div>
             
             <p style="font-size: 12px; color: #aaa; font-style: italic; margin-bottom: 25px;">Your healthcare data is heavily encrypted, fully localized, and compliant with national privacy frameworks.</p>
@@ -442,6 +478,11 @@
     <div class="container" id="mainApp">
         <h1>MedSidekick</h1>
         <p style="text-align:center; color: #aaa; margin-top: -10px; font-style: italic;">Your Digital Assistant</p>
+
+        <!-- Presentation Support Tool -->
+        <button onclick="debugForceAlarmTrigger()" style="width:100%; background:#1a1100; border:1px solid #fbc02d; color:#fbc02d; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; margin-bottom:15px; cursor:pointer;">
+            ⚡ PRESENTATION TOOL: Force Instant Alarm/SMS Simulator
+        </button>
 
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #004d40; background: linear-gradient(145deg, #0d1a1a, #000);">
             <div>
@@ -488,7 +529,7 @@
             </div>
 
             <label>Strength:</label>
-            <input type="text" id="medStrength" placeholder="e.g. 500mg">
+            <input type="text" id="medStrength" placeholder="e.g. 500mg" value="500mg">
             
             <label>Set Medication Time:</label>
             <input type="time" id="medTime">
@@ -499,7 +540,7 @@
         <div class="card">
             <h3 style="margin-top:0; color:#ff5252; border-bottom: 1px solid #222; padding-bottom:10px;">ICE (Emergency Fallback Link)</h3>
             <label style="color:#ff5252;">Emergency Contact Name:</label>
-            <input type="text" id="iceName" placeholder="e.g. Lisa">
+            <input type="text" id="iceName" placeholder="e.g. Lisa" value="Lisa">
             <label style="color:#ff5252;">Emergency Phone Number:</label>
             <input type="text" id="icePhone" placeholder="e.g. +23480...">
             <button class="main-btn" style="background:#b71c1c; margin-top:15px; font-size:16px;" onclick="saveICE()">Save Emergency Contact</button>
@@ -519,3 +560,4 @@
 
 </body>
 </html>
+
