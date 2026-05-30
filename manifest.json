@@ -1,0 +1,22 @@
+{
+  "name": "MedSidekick",
+  "short_name": "MedSidekick",
+  "description": "Your Digital Medication Assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060e0d",
+  "theme_color": "#00bfa5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/00bfa5/ffffff?text=MS",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/00bfa5/ffffff?text=MS",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
