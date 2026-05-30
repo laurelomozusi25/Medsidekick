@@ -54,7 +54,6 @@
     </style>
 
     <script>
-        // --- REMOVED LIVE SUPABASE NETWORK REQUEST DEPENDENCIES FOR FULL OFFLINE STABILITY ---
         let deviceID = localStorage.getItem('medSidekickDeviceID') || "User_" + Math.random().toString(36).substring(2, 7).toUpperCase();
         localStorage.setItem('medSidekickDeviceID', deviceID);
 
@@ -67,7 +66,6 @@
         window.snoozeAlarm = snoozeAlarm;
         window.generateReport = generateReport;
 
-        // Web Audio Synthesizer Engine to bypass device hardware restrictions while active
         let audioCtx = null;
         let alarmIntervalInstance = null;
 
@@ -105,7 +103,6 @@
             showToast("Secure access granted! Welcome aboard 🌟", "#00bfa5");
         }
 
-        // --- CORE LOCAL MEMORY LOGIC FRAMEWORK ---
         let schedule = JSON.parse(localStorage.getItem('medData')) || [];
         let missedCounter = parseInt(localStorage.getItem('missedDoses')) || 0;
         let totalTaken = parseInt(localStorage.getItem('metricsTotalTaken')) || 0;
@@ -114,17 +111,22 @@
         let lastAlert = "";
         let snoozeTimeout = null;
 
-        // PRIORITY 3: Fully Functional Discretion Mode Switching UX
+        // FIXED: Real medication field completely hides and clears out for absolute privacy
         function toggleDiscretionMode() {
             const isChecked = document.getElementById('discretionToggle').checked;
             const medInput = document.getElementById('medName');
+            const medLabel = document.getElementById('medNameLabel');
+            const aliasDiv = document.getElementById('aliasDiv');
             
             if (isChecked) {
-                document.getElementById('aliasDiv').style.display = "block";
-                medInput.placeholder = "e.g. Strategic Masking Alias (e.g., Layer A-1)";
+                aliasDiv.style.display = "block";
+                medInput.style.display = "none";
+                medLabel.style.display = "none";
+                medInput.value = ""; // Clear anything typed to safeguard stigma data
             } else {
-                document.getElementById('aliasDiv').style.display = "none";
-                medInput.placeholder = "e.g. Paracetamol";
+                aliasDiv.style.display = "none";
+                medInput.style.display = "block";
+                medLabel.style.display = "block";
             }
         }
 
@@ -134,7 +136,6 @@
             return Math.round((totalTaken / total) * 100);
         }
 
-        // Replaced Supabase function with completely isolated Local Analytics tracking
         function syncLocalDataOnly() {
             const pName = localStorage.getItem('lastPatient') || "";
             document.getElementById('patientName').value = pName;
@@ -143,18 +144,25 @@
             updateScorecardDisplay();
         }
 
-        // PRIORITY 1: 100% Offline Data Saving Engine via LocalStorage Cache
+        // FIXED: Dynamic validation allows scheduling without requiring real clinical drug names
         function saveMed() {
+            const isDiscreet = document.getElementById('discretionToggle').checked;
             const realName = document.getElementById('medName').value;
+            const aliasName = document.getElementById('medAlias').value;
             const time = document.getElementById('medTime').value;
             const strength = document.getElementById('medStrength').value || "500mg";
-            const isDiscreet = document.getElementById('discretionToggle').checked;
-            const aliasName = document.getElementById('medAlias').value || "Routine Shield";
             const pName = document.getElementById('patientName').value || "Patient";
 
-            if (!realName || !time) return showToast("Fill in Name and Time", "#b71c1c");
+            if (!time) return showToast("Please set a Medication Time", "#b71c1c");
+            
+            if (isDiscreet && !aliasName) {
+                return showToast("Please fill in your Masking Alias Name", "#b71c1c");
+            }
+            
+            if (!isDiscreet && !realName) {
+                return showToast("Please fill in the Medication Name", "#b71c1c");
+            }
 
-            // Complete masking logic assignment
             const displayName = isDiscreet ? aliasName : realName;
 
             const entry = { 
@@ -162,7 +170,7 @@
                 strength, 
                 time, 
                 isDiscreet,
-                realNameEncrypted: isDiscreet ? "Class-2A Agent" : realName 
+                realNameEncrypted: isDiscreet ? "Secure Loop Agent" : realName 
             };
             
             schedule.push(entry);
@@ -178,11 +186,13 @@
             } catch(e) {}
             
             document.getElementById('medName').value = "";
+            document.getElementById('medAlias').value = "";
             document.getElementById('medStrength').value = "500mg";
             document.getElementById('medTime').value = "";
             document.getElementById('discretionToggle').checked = false;
             document.getElementById('aliasDiv').style.display = "none";
-            document.getElementById('medName').placeholder = "e.g. Paracetamol";
+            document.getElementById('medName').style.display = "block";
+            document.getElementById('medNameLabel').style.display = "block";
         }
 
         function renderMeds() {
@@ -228,7 +238,6 @@
             }
         }
 
-        // PRIORITY 2: Foreground Clock Reminders & Audio Alert Pipeline
         setInterval(() => {
             const now = new Date();
             const clock = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
@@ -251,7 +260,7 @@
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Sharp high pitch beep
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
@@ -329,7 +338,6 @@
                 totalSkipped++;
                 localStorage.setItem('metricsTotalSkipped', totalSkipped);
                 
-                // PRIORITY 4: Semi-Automated Intent Routing Pattern
                 if (missedCounter >= 3) {
                     currentStreak = 0;
                     localStorage.setItem('metricsCurrentStreak', currentStreak);
@@ -346,7 +354,6 @@
                         if (savedICE && savedICE.phone) {
                             const msg = `Hello! This is a friendly care update from MedSidekick. 🌟 ${pName} hasn't logged their routine medication for a few slots today. Could you kindly reach out, give them a warm call, or check in on them to make sure they are doing great? Thank you for being an amazing support system! ❤️`;
                             
-                            // Bypasses core runtime to throw open native dialer message framework seamlessly
                             window.location.href = `sms:${savedICE.phone}?body=${encodeURIComponent(msg)}`;
                         } else {
                             alert("Warning: 3 doses missed, but no Emergency Contact Number was saved to deploy payload.");
@@ -442,7 +449,6 @@
             setTimeout(() => t.remove(), 3000);
         }
 
-        // Quick simulation helper function for presentations
         function debugForceAlarmTrigger() {
             if (schedule.length === 0) {
                 triggerAlarm("Demo Shield Alpha", "300mg", true);
@@ -479,7 +485,6 @@
         <h1>MedSidekick</h1>
         <p style="text-align:center; color: #aaa; margin-top: -10px; font-style: italic;">Your Digital Assistant</p>
 
-        <!-- Presentation Support Tool -->
         <button onclick="debugForceAlarmTrigger()" style="width:100%; background:#1a1100; border:1px solid #fbc02d; color:#fbc02d; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; margin-bottom:15px; cursor:pointer;">
             ⚡ PRESENTATION TOOL: Force Instant Alarm/SMS Simulator
         </button>
@@ -519,7 +524,7 @@
                 </label>
             </div>
 
-            <label>Medication Name:</label>
+            <label id="medNameLabel">Medication Name:</label>
             <input type="text" id="medName" placeholder="e.g. Paracetamol">
             
             <div id="aliasDiv">
@@ -560,4 +565,3 @@
 
 </body>
 </html>
-
