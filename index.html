@@ -2,566 +2,561 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MedSidekick</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00bfa5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MedSidekick">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: sans-serif; background-color: #000; color: white; margin: 0; padding: 20px; }
-        #introScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        #logoText { color: #00bfa5; font-family: monospace; font-size: 28px; border-right: 3px solid #00bfa5; white-space: nowrap; overflow: hidden; letter-spacing: 2px; }
-        .container { max-width: 500px; margin: auto; display: none; }
-        h1 { color: #00bfa5; text-align: center; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px; }
-        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #00bfa5; font-size: 14px; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #333; background: #1a1a1a; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        
-        /* Scorecard Badge Styling */
-        .score-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; margin-top: 5px; background: #222; border: 1px solid #333; color: #aaa; }
-        .gold-badge { background: #2b2100; border: 1px solid #fbc02d; color: #fbc02d; }
-        .silver-badge { background: #1a237e; border: 1px solid #3f51b5; color: #e0e0e0; }
-        .bronze-badge { background: #2a1405; border: 1px solid #ffb74d; color: #ffb74d; }
+        :root {
+            --teal: #00bfa5;
+            --teal-dark: #008073;
+            --teal-dim: #004d40;
+            --gold: #fbc02d;
+            --red: #ef5350;
+            --red-dark: #b71c1c;
+            --bg: #060e0d;
+            --card: #0d1a18;
+            --border: #1a2e2b;
+            --text: #e8f5f3;
+            --muted: #607d7b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-        /* Toggle Switch Styling */
-        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        #introScreen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+        .intro-logo { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--teal); letter-spacing: 2px; border-right: 3px solid var(--teal); white-space: nowrap; overflow: hidden; width: 0; animation: typing 1.8s steps(12,end) forwards, blink 0.7s step-end 4; }
+        @keyframes typing { to { width: 14ch; } }
+        @keyframes blink { 50% { border-color: transparent; } }
+        .intro-sub { font-size: 13px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; opacity: 0; animation: fadeUp 0.6s ease 2s forwards; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+        #permissionsScreen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9998; padding: 30px 20px; overflow-y: auto; }
+        .perm-card { max-width: 420px; margin: 40px auto 0; background: var(--card); border: 1px solid var(--teal-dim); border-radius: 20px; padding: 30px; text-align: center; }
+        .perm-card h2 { font-family: 'Syne', sans-serif; color: var(--teal); font-size: 22px; margin-bottom: 12px; }
+        .perm-card p { color: #90a4a1; font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+        .perm-list { text-align: left; background: #0a1614; border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .perm-list p { margin: 0 0 12px 0; font-size: 13px; color: #aaa; }
+        .perm-list p:last-child { margin-bottom: 0; }
+        .perm-note { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 24px; }
+
+        #mainApp { display: none; max-width: 480px; margin: 0 auto; padding: 20px 16px 80px; }
+        .app-header { text-align: center; padding: 20px 0 10px; }
+        .app-header h1 { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: var(--teal); letter-spacing: 1px; }
+        .app-header p { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+
+        .scorecard { background: linear-gradient(135deg, #0d1a18, #0a1410); border: 1px solid var(--teal-dim); border-radius: 18px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .scorecard-left .label { font-size: 10px; color: var(--teal); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .scorecard-left .value { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; color: white; line-height: 1.1; }
+        .scorecard-right { text-align: right; border-left: 1px solid var(--border); padding-left: 20px; }
+        .scorecard-right .label { font-size: 10px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .scorecard-right .value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: white; }
+        .score-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 6px; background: #1a2e2b; border: 1px solid var(--border); color: var(--muted); }
+        .gold-badge { background: #2b2100; border-color: var(--gold); color: var(--gold); }
+        .silver-badge { background: #1a1f3e; border-color: #7986cb; color: #c5cae9; }
+        .bronze-badge { background: #2a1405; border-color: #ffb74d; color: #ffb74d; }
+
+        #alarmBox { display: none; background: linear-gradient(135deg, #1a0f00, #2b1a00); border: 2px solid var(--gold); border-radius: 18px; padding: 22px; margin-bottom: 16px; text-align: center; animation: pulse-border 1s ease-in-out infinite alternate; }
+        @keyframes pulse-border { from { box-shadow: 0 0 10px rgba(251,192,45,0.2); } to { box-shadow: 0 0 25px rgba(251,192,45,0.5); } }
+        #alarmBox h2 { font-family: 'Syne', sans-serif; color: var(--gold); font-size: 18px; margin-bottom: 8px; }
+        #alarmDetails { font-size: 20px; font-weight: 700; margin: 12px 0 18px; color: white; }
+        .alarm-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .alarm-btns button { padding: 13px 6px; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .btn-taken { background: #2e7d32; color: white; }
+        .btn-snooze { background: #e65100; color: white; }
+        .btn-skip { background: var(--red-dark); color: white; }
+
+        #iceAlertBox { display: none; background: linear-gradient(135deg, #1a0000, #2b0a0a); border: 2px solid var(--red); border-radius: 18px; padding: 22px; margin-bottom: 16px; text-align: center; }
+        #iceAlertBox h2 { font-family: 'Syne', sans-serif; color: var(--red); font-size: 18px; margin-bottom: 8px; }
+        #iceAlertBox p { font-size: 14px; color: #ffcdd2; margin-bottom: 18px; line-height: 1.5; }
+        .ice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ice-btns button { padding: 14px; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .btn-call { background: #1b5e20; color: white; }
+        .btn-sms { background: #0d47a1; color: white; }
+        .btn-dismiss { grid-column: 1/-1; background: #1a1a1a; color: var(--muted); border: 1px solid var(--border); margin-top: 4px; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
+        .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--teal); border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .card-title.red { color: var(--red); }
+
+        label { display: block; font-size: 12px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; margin-top: 14px; }
+        label.red { color: var(--red); }
+        label:first-of-type { margin-top: 0; }
+        input[type="text"], input[type="time"], input[type="tel"] { width: 100%; padding: 13px 14px; background: #0a1614; color: var(--text); border: 1px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: var(--teal); }
+        input::placeholder { color: var(--muted); }
+
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; background: #0a1614; border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; margin-top: 14px; }
+        .toggle-row span { font-size: 13px; font-weight: 500; color: var(--teal); }
+        .switch { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #00bfa5; }
-        input:checked + .slider:before { transform: translateX(24px); }
+        .slider { position: absolute; inset: 0; background: #1a2e2b; border-radius: 34px; cursor: pointer; transition: 0.3s; }
+        .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.3s; }
+        input:checked + .slider { background: var(--teal); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        button.main-btn { width: 100%; padding: 15px; background: #008080; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        #alarmBox { display: none; background: #2b2100; padding: 20px; border-radius: 15px; text-align: center; border: 2px solid #fbc02d; margin-bottom: 20px; }
-        .med-item { background: #001a1a; padding: 15px; border-radius: 12px; margin-top: 12px; border: 1px solid #004d40; display: flex; justify-content: space-between; align-items: center; }
-        .remove-btn { background: #b71c1c; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .ice-badge { background: #310000; border: 1px solid #b71c1c; padding: 10px; border-radius: 8px; font-size: 13px; color: #ff8a80; margin-top: 10px; text-align: center; display: none; }
-        #aliasDiv { display: none; }
-        
-        /* Premium Dashboard Report Card Layout */
-        #reportDisplay { 
-            display: none; 
-            background: #0d1a1a; 
-            border: 1px solid #00bfa5; 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-top: 20px; 
-            font-family: sans-serif; 
-            color: #fff; 
-            box-shadow: 0 4px 15px rgba(0, 191, 165, 0.1);
-        }
-        .report-header { text-align: center; border-bottom: 1px solid #004d40; padding-bottom: 10px; margin-bottom: 15px; }
-        .report-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #222; font-size: 14px; }
-        .report-section-title { color: #00bfa5; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; margin-bottom: 5px; }
+        #aliasDiv { display: none; margin-top: 4px; }
+        .alias-note { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 6px; }
+
+        .btn-primary { width: 100%; padding: 15px; background: var(--teal-dark); color: white; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-top: 18px; cursor: pointer; transition: background 0.2s; }
+        .btn-primary.danger { background: var(--red-dark); }
+        .btn-primary.ghost { background: transparent; color: var(--teal); border: 1px solid var(--teal-dim); }
+        .demo-btn { width: 100%; background: #1a1100; border: 1px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-bottom: 14px; cursor: pointer; }
+
+        .med-item { background: #071210; border: 1px solid var(--teal-dim); border-radius: 12px; padding: 14px 16px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .med-item-info { flex: 1; min-width: 0; }
+        .med-item-info b { font-size: 16px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .med-item-info .med-meta { font-size: 12px; color: var(--teal); font-weight: 600; margin-top: 3px; }
+        .remove-btn { background: var(--red-dark); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+        .ice-armed { background: #1a0000; border: 1px solid var(--red-dark); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #ff8a80; margin-top: 12px; display: none; line-height: 1.5; }
+
+        #reportDisplay { display: none; background: #071210; border: 1px solid var(--teal-dim); border-radius: 16px; padding: 20px; margin-top: 16px; }
+        .report-header { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+        .report-header h3 { font-family: 'Syne', sans-serif; color: var(--teal); font-size: 14px; letter-spacing: 2px; }
+        .report-header small { color: var(--muted); font-size: 11px; }
+        .report-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+        .report-section { font-size: 10px; color: var(--teal); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin: 16px 0 6px; }
+        .report-note { font-size: 10px; color: var(--muted); font-style: italic; text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.5; }
+
+        .section-label { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 8px 4px; }
+        .empty-state { text-align: center; color: var(--muted); font-style: italic; padding: 20px 0; font-size: 13px; }
+        .footer { text-align: center; font-size: 10px; color: #2a3d3a; margin-top: 30px; letter-spacing: 0.5px; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 30px; z-index: 10000; font-weight: 600; font-size: 13px; text-align: center; min-width: 240px; max-width: 85vw; box-shadow: 0 4px 20px rgba(0,0,0,0.5); animation: toastIn 0.3s ease; }
+        @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
     </style>
-
-    <script>
-        let deviceID = localStorage.getItem('medSidekickDeviceID') || "User_" + Math.random().toString(36).substring(2, 7).toUpperCase();
-        localStorage.setItem('medSidekickDeviceID', deviceID);
-
-        window.saveMed = saveMed;
-        window.removeMed = removeMed;
-        window.saveICE = saveICE;
-        window.doseAction = doseAction;
-        window.toggleDiscretionMode = toggleDiscretionMode;
-        window.acceptPermissions = acceptPermissions;
-        window.snoozeAlarm = snoozeAlarm;
-        window.generateReport = generateReport;
-
-        let audioCtx = null;
-        let alarmIntervalInstance = null;
-
-        const brand = "MedSidekick...";
-        let charIdx = 0;
-        function typeEffect() {
-            if (charIdx < brand.length) {
-                document.getElementById("logoText").textContent += brand.charAt(charIdx);
-                charIdx++;
-                setTimeout(typeEffect, 140);
-            } else {
-                setTimeout(() => {
-                    document.getElementById("introScreen").style.display = "none";
-                    checkAppPermissions();
-                }, 900);
-            }
-        }
-        window.onload = typeEffect;
-
-        function checkAppPermissions() {
-            const hasPermission = localStorage.getItem('medSidekickPermissionsGranted');
-            if (!hasPermission) {
-                document.getElementById("permissionsScreen").style.display = "block";
-            } else {
-                document.getElementById("mainApp").style.display = "block";
-                syncLocalDataOnly();
-            }
-        }
-
-        function acceptPermissions() {
-            localStorage.setItem('medSidekickPermissionsGranted', 'true');
-            document.getElementById("permissionsScreen").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            syncLocalDataOnly();
-            showToast("Secure access granted! Welcome aboard 🌟", "#00bfa5");
-        }
-
-        let schedule = JSON.parse(localStorage.getItem('medData')) || [];
-        let missedCounter = parseInt(localStorage.getItem('missedDoses')) || 0;
-        let totalTaken = parseInt(localStorage.getItem('metricsTotalTaken')) || 0;
-        let totalSkipped = parseInt(localStorage.getItem('metricsTotalSkipped')) || 0;
-        let currentStreak = parseInt(localStorage.getItem('metricsCurrentStreak')) || 0;
-        let lastAlert = "";
-        let snoozeTimeout = null;
-
-        // FIXED: Real medication field completely hides and clears out for absolute privacy
-        function toggleDiscretionMode() {
-            const isChecked = document.getElementById('discretionToggle').checked;
-            const medInput = document.getElementById('medName');
-            const medLabel = document.getElementById('medNameLabel');
-            const aliasDiv = document.getElementById('aliasDiv');
-            
-            if (isChecked) {
-                aliasDiv.style.display = "block";
-                medInput.style.display = "none";
-                medLabel.style.display = "none";
-                medInput.value = ""; // Clear anything typed to safeguard stigma data
-            } else {
-                aliasDiv.style.display = "none";
-                medInput.style.display = "block";
-                medLabel.style.display = "block";
-            }
-        }
-
-        function calculateComplianceRate() {
-            const total = totalTaken + totalSkipped;
-            if (total === 0) return 100;
-            return Math.round((totalTaken / total) * 100);
-        }
-
-        function syncLocalDataOnly() {
-            const pName = localStorage.getItem('lastPatient') || "";
-            document.getElementById('patientName').value = pName;
-            renderMeds();
-            loadICE();
-            updateScorecardDisplay();
-        }
-
-        // FIXED: Dynamic validation allows scheduling without requiring real clinical drug names
-        function saveMed() {
-            const isDiscreet = document.getElementById('discretionToggle').checked;
-            const realName = document.getElementById('medName').value;
-            const aliasName = document.getElementById('medAlias').value;
-            const time = document.getElementById('medTime').value;
-            const strength = document.getElementById('medStrength').value || "500mg";
-            const pName = document.getElementById('patientName').value || "Patient";
-
-            if (!time) return showToast("Please set a Medication Time", "#b71c1c");
-            
-            if (isDiscreet && !aliasName) {
-                return showToast("Please fill in your Masking Alias Name", "#b71c1c");
-            }
-            
-            if (!isDiscreet && !realName) {
-                return showToast("Please fill in the Medication Name", "#b71c1c");
-            }
-
-            const displayName = isDiscreet ? aliasName : realName;
-
-            const entry = { 
-                name: displayName, 
-                strength, 
-                time, 
-                isDiscreet,
-                realNameEncrypted: isDiscreet ? "Secure Loop Agent" : realName 
-            };
-            
-            schedule.push(entry);
-            localStorage.setItem('medData', JSON.stringify(schedule));
-            localStorage.setItem('lastPatient', pName);
-            renderMeds();
-
-            showToast("Saved securely in localized vault! 🔒", "#008080");
-            updateScorecardDisplay();
-            
-            try {
-                speechSynthesis.speak(new SpeechSynthesisUtterance("Regimen mapped for " + displayName));
-            } catch(e) {}
-            
-            document.getElementById('medName').value = "";
-            document.getElementById('medAlias').value = "";
-            document.getElementById('medStrength').value = "500mg";
-            document.getElementById('medTime').value = "";
-            document.getElementById('discretionToggle').checked = false;
-            document.getElementById('aliasDiv').style.display = "none";
-            document.getElementById('medName').style.display = "block";
-            document.getElementById('medNameLabel').style.display = "block";
-        }
-
-        function renderMeds() {
-            const list = document.getElementById('medList');
-            list.innerHTML = schedule.length ? "" : "<p style='text-align:center; color:#555; font-style:italic;'>No active medications.</p>";
-            schedule.forEach((m, i) => {
-                list.innerHTML += `
-                    <div class="med-item">
-                        <div>
-                            <b style="font-size:17px;">${m.name}</b> <span style="color:#aaa;">(${m.strength})</span><br>
-                            <small style="color:#00bfa5; font-weight:bold;">${m.isDiscreet ? '🔒 Discreet Loop' : '⏰ Standard Loop'} at ${m.time}</small>
-                        </div>
-                        <button class="remove-btn" onclick="removeMed(${i})">REMOVE</button>
-                    </div>`;
-            });
-        }
-
-        function removeMed(index) {
-            schedule.splice(index, 1);
-            localStorage.setItem('medData', JSON.stringify(schedule));
-            renderMeds();
-            showToast("Regimen updated successfully.", "#333");
-            updateScorecardDisplay();
-        }
-
-        function saveICE() {
-            const name = document.getElementById('iceName').value || "Lisa";
-            const phone = document.getElementById('icePhone').value;
-            if (!phone) return showToast("Fill in contact phone number!", "#b71c1c");
-            localStorage.setItem('iceData', JSON.stringify({ name, phone }));
-            showToast("ICE safety mesh armed!", "#c62828");
-            document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${name}</b>`;
-            document.getElementById('iceActiveBadge').style.display = "block";
-        }
-
-        function loadICE() {
-            const savedICE = JSON.parse(localStorage.getItem('iceData'));
-            if (savedICE) {
-                document.getElementById('iceName').value = savedICE.name;
-                document.getElementById('icePhone').value = savedICE.phone;
-                document.getElementById('iceActiveBadge').innerHTML = `🛡️ <b>System Armed:</b> Safety triggers tracked for support line: <b>${savedICE.name}</b>`;
-                document.getElementById('iceActiveBadge').style.display = "block";
-            }
-        }
-
-        setInterval(() => {
-            const now = new Date();
-            const clock = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            if (clock !== lastAlert) {
-                schedule.forEach(m => {
-                    if (m.time === clock) {
-                        lastAlert = clock;
-                        triggerAlarm(m.name, m.strength, m.isDiscreet);
-                    }
-                });
-            }
-        }, 3000);
-
-        function playWebAlarmSound() {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (alarmIntervalInstance) clearInterval(alarmIntervalInstance);
-                
-                alarmIntervalInstance = setInterval(() => {
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.15);
-                }, 400);
-            } catch(e) { console.log("Audio contexts pending interaction."); }
-        }
-
-        function stopWebAlarmSound() {
-            if (alarmIntervalInstance) {
-                clearInterval(alarmIntervalInstance);
-                alarmIntervalInstance = null;
-            }
-        }
-
-        function triggerAlarm(name, strength, isDiscreet) {
-            if (snoozeTimeout) clearTimeout(snoozeTimeout);
-            const pName = document.getElementById('patientName').value || "Patient";
-            
-            try {
-                speechSynthesis.speak(new SpeechSynthesisUtterance("Attention " + pName + ", time for your scheduled routine."));
-            } catch(e) {}
-            
-            playWebAlarmSound();
-            
-            document.getElementById('alarmDetails').innerText = name + " (" + strength + ")";
-            document.getElementById('alarmBox').style.display = "block";
-            document.getElementById('alarmBox').dataset.isDiscreet = isDiscreet;
-            document.getElementById('alarmBox').dataset.currentName = name;
-            document.getElementById('alarmBox').dataset.currentStrength = strength;
-        }
-
-        function snoozeAlarm() {
-            const name = document.getElementById('alarmBox').dataset.currentName;
-            const strength = document.getElementById('alarmBox').dataset.currentStrength;
-            const isDiscreet = document.getElementById('alarmBox').dataset.isDiscreet;
-            
-            stopWebAlarmSound();
-            document.getElementById('alarmBox').style.display = "none";
-            showToast("⏰ Smart Snooze initialized. Ringing again in 15 minutes.", "#fbc02d");
-            
-            snoozeTimeout = setTimeout(() => {
-                triggerAlarm(name, strength, isDiscreet === "true");
-            }, 15 * 60 * 1000); 
-        }
-
-        function doseAction(taken) {
-            stopWebAlarmSound();
-            const isDiscreet = document.getElementById('alarmBox').dataset.isDiscreet === "true";
-            document.getElementById('alarmBox').style.display = "none";
-            const pName = document.getElementById('patientName').value || "Patient";
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            let lastStreakDate = localStorage.getItem('metricsLastStreakDate') || "";
-            
-            if (taken) {
-                missedCounter = 0;
-                localStorage.setItem('missedDoses', 0);
-                
-                totalTaken++;
-                localStorage.setItem('metricsTotalTaken', totalTaken);
-                
-                if (lastStreakDate !== todayStr) {
-                    currentStreak++;
-                    localStorage.setItem('metricsCurrentStreak', currentStreak);
-                    localStorage.setItem('metricsLastStreakDate', todayStr);
-                }
-                
-                showToast("Adherence metrics updated! 📊", "#00bfa5");
-            } else {
-                missedCounter++;
-                localStorage.setItem('missedDoses', missedCounter);
-                
-                totalSkipped++;
-                localStorage.setItem('metricsTotalSkipped', totalSkipped);
-                
-                if (missedCounter >= 3) {
-                    currentStreak = 0;
-                    localStorage.setItem('metricsCurrentStreak', currentStreak);
-                    localStorage.removeItem('metricsLastStreakDate');
-
-                    if (isDiscreet) {
-                        showToast("🔒 Max misses reached. Secure local protocol activated.", "#fbc02d");
-                        alert("Confidential Privacy System Warning: 3 consecutive doses have been missed. Due to your active Discretion Settings, automated SMS notifications are restricted to maintain patient confidentiality. Please contact your consultant panel directly.");
-                        missedCounter = 0;
-                        localStorage.setItem('missedDoses', 0);
-                    } else {
-                        showToast("Bypassing sandbox to load message payload...", "#b71c1c");
-                        const savedICE = JSON.parse(localStorage.getItem('iceData'));
-                        if (savedICE && savedICE.phone) {
-                            const msg = `Hello! This is a friendly care update from MedSidekick. 🌟 ${pName} hasn't logged their routine medication for a few slots today. Could you kindly reach out, give them a warm call, or check in on them to make sure they are doing great? Thank you for being an amazing support system! ❤️`;
-                            
-                            window.location.href = `sms:${savedICE.phone}?body=${encodeURIComponent(msg)}`;
-                        } else {
-                            alert("Warning: 3 doses missed, but no Emergency Contact Number was saved to deploy payload.");
-                        }
-                        missedCounter = 0;
-                        localStorage.setItem('missedDoses', 0);
-                    }
-                } else {
-                    showToast(`Dose logged as skipped (${missedCounter}/3 missed)`, "#fbc02d");
-                }
-            }
-            
-            updateScorecardDisplay();
-        }
-
-        function updateScorecardDisplay() {
-            const totalSlots = totalTaken + totalSkipped;
-            let percentage = totalSlots > 0 ? Math.round((totalTaken / totalSlots) * 100) : 100;
-            
-            document.getElementById('statCompliance').innerText = percentage + "%";
-            document.getElementById('statStreak').innerText = currentStreak + " days";
-            
-            const badgeElement = document.getElementById('badgeRank');
-            badgeElement.className = "score-badge";
-            
-            if (totalTaken === 0) {
-                badgeElement.innerText = "🆕 System Onboarded";
-            } else if (percentage >= 90 && totalTaken >= 15) {
-                badgeElement.innerText = "🥇 Gold Elite Guardian";
-                badgeElement.classList.add('gold-badge');
-            } else if (percentage >= 75 && totalTaken >= 7) {
-                badgeElement.innerText = "🥈 Silver Mastery Loop";
-                badgeElement.classList.add('silver-badge');
-            } else if (totalTaken >= 3) {
-                badgeElement.innerText = "🥉 Bronze Adherence Shield";
-                badgeElement.classList.add('bronze-badge');
-            }
-        }
-
-        function generateReport() {
-            const pName = document.getElementById('patientName').value || "Patient";
-            const totalSlots = totalTaken + totalSkipped;
-            let percentage = totalSlots > 0 ? Math.round((totalTaken / totalSlots) * 100) : 100;
-            
-            let htmlReport = `
-                <div class="report-header">
-                    <h3 style="margin: 0; color: #00bfa5; letter-spacing: 1px;">MEDSIDEKICK CLINICAL AUDIT</h3>
-                    <small style="color: #666;">Generated: ${new Date().toLocaleDateString()} | ${new Date().toLocaleTimeString()}</small>
-                </div>
-                
-                <div class="report-row"><span>Patient ID:</span><span style="color:#00bfa5; font-weight:bold;">${pName}</span></div>
-                <div class="report-row"><span>Security Hash:</span><span style="color:#aaa; font-family:monospace;">MS-${deviceID}</span></div>
-                
-                <div class="report-section-title">Core Performance Metrics</div>
-                <div class="report-row"><span>Gross Compliance Rate:</span><b style="color:${percentage >= 85 ? '#00bfa5' : '#ffb74d'};">${percentage}%</b></div>
-                <div class="report-row"><span>Adherence Successes:</span><span>${totalTaken} doses logged</span></div>
-                <div class="report-row"><span>Missed/Skipped Slots:</span><span>${totalSkipped} intervals</span></div>
-                <div class="report-row"><span>Active Unbroken Streak:</span><span style="color:#ffb74d; font-weight:bold;">${currentStreak} days</span></div>
-                
-                <div class="report-section-title">Active Regimen Map</div>
-            `;
-            
-            if (schedule.length === 0) {
-                htmlReport += `<div style="color:#555; font-style:italic; padding: 10px 0;">No active regimens registered in client sandbox.</div>`;
-            } else {
-                schedule.forEach((m, i) => {
-                    htmlReport += `
-                        <div class="report-row" style="align-items: center;">
-                            <div>
-                                <b>${m.name}</b> <small style="color:#aaa;">(${m.strength})</small>
-                            </div>
-                            <span style="color:#00bfa5; font-size:12px; font-weight:bold;">${m.time} [${m.isDiscreet ? '🔒 Discreet' : '⏰ Standard'}]</span>
-                        </div>`;
-                });
-            }
-            
-            htmlReport += `
-                <p style="margin-top:20px; margin-bottom:0; font-size:11px; color:#555; line-height:1.4; font-style:italic; border-top:1px solid #222; padding-top:10px; text-align:center;">
-                    Clinical Note: Data securely isolated inside client decentralized vaults. Verify signatures manually.
-                </p>
-            `;
-            
-            const displayBlock = document.getElementById('reportDisplay');
-            displayBlock.innerHTML = htmlReport;
-            displayBlock.style.display = displayBlock.style.display === "block" ? "none" : "block";
-        }
-
-        function showToast(msg, bgColor) {
-            const t = document.createElement("div");
-            t.innerText = msg;
-            t.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${bgColor || '#00bfa5'}; color:white; padding:12px 24px; border-radius:30px; z-index:10000; font-weight:bold; font-size:14px; text-align:center; min-width:250px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);`;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        function debugForceAlarmTrigger() {
-            if (schedule.length === 0) {
-                triggerAlarm("Demo Shield Alpha", "300mg", true);
-            } else {
-                triggerAlarm(schedule[0].name, schedule[0].strength, schedule[0].isDiscreet);
-            }
-            showToast("Presentation sandbox alarm fired! ⚡", "#00bfa5");
-        }
-        window.debugForceAlarmTrigger = debugForceAlarmTrigger;
-    </script>
 </head>
 <body>
 
-    <div id="introScreen">
-        <h1 id="logoText"></h1>
-    </div>
+<div id="introScreen">
+    <div class="intro-logo">MedSidekick</div>
+    <div class="intro-sub">Your Digital Health Assistant</div>
+</div>
 
-    <div id="permissionsScreen" style="display: none; max-width: 450px; margin: 50px auto; padding: 25px;">
-        <div class="card" style="border: 2px solid #00bfa5; padding: 30px; text-align: center;">
-            <h2 style="color: #00bfa5; margin-top: 0;">Welcome to MedSidekick! 🛡️</h2>
-            <p style="line-height: 1.6; color: #ddd; font-size: 15px;">To help ensure maximum therapeutic compliance and log vital safety parameters, our ecosystem requires your permission to access the following data:</p>
-            
-            <div style="text-align: left; background: #1a1a1a; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #333;">
-                <p style="margin: 5px 0; font-size: 14px;">📊 <b>Anonymized Adherence Data:</b> Track internal trends dynamically to optimize treatment outcomes.</p>
-                <p style="margin: 15px 0 5px 0; font-size: 14px;">💬 <b>Emergency SMS Routing:</b> Pre-format critical safety text warnings to support groups instantly.</p>
-            </div>
-            
-            <p style="font-size: 12px; color: #aaa; font-style: italic; margin-bottom: 25px;">Your healthcare data is heavily encrypted, fully localized, and compliant with national privacy frameworks.</p>
-            <button class="main-btn" onclick="acceptPermissions()">I Accept & Grant Access</button>
+<div id="permissionsScreen">
+    <div class="perm-card">
+        <h2>Welcome to MedSidekick 🛡️</h2>
+        <p>To provide safe medication reminders and emergency contact support, we need your permission for the following:</p>
+        <div class="perm-list">
+            <p>📊 <strong>Adherence Tracking:</strong> Monitor dose schedules locally on your device.</p>
+            <p>💬 <strong>Emergency SMS & Call:</strong> One-tap emergency alerts when doses are missed.</p>
+            <p>🔔 <strong>Voice Reminders:</strong> Speak your medication name aloud at scheduled times.</p>
         </div>
+        <p class="perm-note">All data is stored securely on your device only. Nothing is shared without your action.</p>
+        <button class="btn-primary" onclick="acceptPermissions()">I Accept & Get Started</button>
     </div>
+</div>
 
-    <div class="container" id="mainApp">
+<div id="mainApp">
+    <div class="app-header">
         <h1>MedSidekick</h1>
-        <p style="text-align:center; color: #aaa; margin-top: -10px; font-style: italic;">Your Digital Assistant</p>
-
-        <button onclick="debugForceAlarmTrigger()" style="width:100%; background:#1a1100; border:1px solid #fbc02d; color:#fbc02d; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; margin-bottom:15px; cursor:pointer;">
-            ⚡ PRESENTATION TOOL: Force Instant Alarm/SMS Simulator
-        </button>
-
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #004d40; background: linear-gradient(145deg, #0d1a1a, #000);">
-            <div>
-                <span style="font-size: 12px; color: #00bfa5; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Adherence Rate</span>
-                <div id="statCompliance" style="font-size: 28px; font-weight: bold; color: white; margin: 2px 0;">100%</div>
-                <div id="badgeRank" class="score-badge">🆕 System Onboarded</div>
-            </div>
-            <div style="text-align: right; border-left: 1px solid #222; padding-left: 20px;">
-                <span style="font-size: 12px; color: #ffb74d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Active Streak</span>
-                <div id="statStreak" style="font-size: 24px; font-weight: bold; color: white; margin: 2px 0;">0 days</div>
-            </div>
-        </div>
-
-        <div id="alarmBox">
-            <h2 id="alarmTitle" style="color: #fbc02d; margin: 0;">Therapy Reminder Engine</h2>
-            <p id="alarmDetails" style="font-size: 18px; font-weight: bold; margin: 15px 0;"></p>
-            <div style="display: flex; justify-content: space-between;">
-                <button onclick="doseAction(true)" style="background:#2e7d32; color:white; border:none; padding:12px; border-radius:8px; width:31%; font-weight:bold; font-size:14px; cursor:pointer;">Taken</button>
-                <button onclick="snoozeAlarm()" style="background:#e65100; color:white; border:none; padding:12px; border-radius:8px; width:34%; font-weight:bold; font-size:14px; cursor:pointer;">Snooze (15m)</button>
-                <button onclick="doseAction(false)" style="background:#c62828; color:white; border:none; padding:12px; border-radius:8px; width:31%; font-weight:bold; font-size:14px; cursor:pointer;">Skip</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top:0; color:#00bfa5; border-bottom: 1px solid #222; padding-bottom:10px;">Schedule Setup</h3>
-            <label>Patient ID / Name:</label>
-            <input type="text" id="patientName" placeholder="e.g. Patient Code/Initials">
-            
-            <div class="toggle-container">
-                <span style="font-size: 14px; font-weight: bold; color: #00bfa5;">🔒 Enable Discretion Mode (Stigma Care)</span>
-                <label class="switch">
-                    <input type="checkbox" id="discretionToggle" onchange="toggleDiscretionMode()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <label id="medNameLabel">Medication Name:</label>
-            <input type="text" id="medName" placeholder="e.g. Paracetamol">
-            
-            <div id="aliasDiv">
-                <label style="color: #fbc02d;">Medication Masking Alias Name:</label>
-                <input type="text" id="medAlias" placeholder="e.g. My Custom Vitamin Layer">
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: #aaa; font-style: italic;">Type a custom code name to completely mask the clinical drug name on all displays and voice alerts.</p>
-            </div>
-
-            <label>Strength:</label>
-            <input type="text" id="medStrength" placeholder="e.g. 500mg" value="500mg">
-            
-            <label>Set Medication Time:</label>
-            <input type="time" id="medTime">
-            
-            <button class="main-btn" onclick="saveMed()">Save Schedule</button>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top:0; color:#ff5252; border-bottom: 1px solid #222; padding-bottom:10px;">ICE (Emergency Fallback Link)</h3>
-            <label style="color:#ff5252;">Emergency Contact Name:</label>
-            <input type="text" id="iceName" placeholder="e.g. Lisa" value="Lisa">
-            <label style="color:#ff5252;">Emergency Phone Number:</label>
-            <input type="text" id="icePhone" placeholder="e.g. +23480...">
-            <button class="main-btn" style="background:#b71c1c; margin-top:15px; font-size:16px;" onclick="saveICE()">Save Emergency Contact</button>
-            <div id="iceActiveBadge" class="ice-badge"></div>
-        </div>
-
-        <h3 style="color:#00bfa5; margin-left: 5px;">Active Regimen</h3>
-        <div id="medList"></div>
-        
-        <button class="main-btn" style="background: #1a1a1a; color: #00bfa5; border: 1px solid #004d40; margin-top: 30px; font-size: 15px;" onclick="generateReport()">📋 Generate Clinical Audit Report</button>
-        <div id="reportDisplay"></div>
-        
-        <p style="text-align: center; font-size: 11px; color: #444; margin-top: 25px; letter-spacing: 0.5px;">
-            MedSidekick Ecosystem v1.5 • Designed by Laurel Omozusi
-        </p>
+        <p>Your Digital Assistant</p>
     </div>
 
+    <button class="demo-btn" onclick="debugForceAlarm()">⚡ DEMO: Trigger Test Alarm</button>
+
+    <div class="scorecard">
+        <div class="scorecard-left">
+            <div class="label">Adherence Rate</div>
+            <div class="value" id="statCompliance">—</div>
+            <div id="badgeRank" class="score-badge">🆕 Getting Started</div>
+        </div>
+        <div class="scorecard-right">
+            <div class="label">Active Streak</div>
+            <div class="value" id="statStreak">0 days</div>
+        </div>
+    </div>
+
+    <div id="alarmBox">
+        <h2>⏰ Medication Reminder</h2>
+        <div id="alarmDetails"></div>
+        <div class="alarm-btns">
+            <button class="btn-taken" onclick="doseAction(true)">✅ Taken</button>
+            <button class="btn-snooze" onclick="snoozeAlarm()">⏱ Snooze 15m</button>
+            <button class="btn-skip" onclick="doseAction(false)">❌ Skip</button>
+        </div>
+    </div>
+
+    <div id="iceAlertBox">
+        <h2>🚨 Missed Doses Alert</h2>
+        <p id="iceAlertMsg"></p>
+        <div class="ice-btns">
+            <button class="btn-call" id="iceCallBtn" onclick="iceCall()">📞 Call Contact</button>
+            <button class="btn-sms" id="iceSmsBtn" onclick="iceSMS()">💬 Send SMS</button>
+            <button class="btn-primary btn-dismiss" onclick="dismissICE()">Dismiss</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Schedule Setup</div>
+        <label>Patient Name / ID</label>
+        <input type="text" id="patientName" placeholder="e.g. Patient initials or code">
+        <div class="toggle-row">
+            <span>🔒 Discretion Mode (Stigma Care)</span>
+            <label class="switch">
+                <input type="checkbox" id="discretionToggle" onchange="toggleDiscretionMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div id="medNameSection">
+            <label>Medication Name</label>
+            <input type="text" id="medName" placeholder="e.g. Paracetamol">
+        </div>
+        <div id="aliasDiv">
+            <label style="color: var(--gold);">Masking Alias Name</label>
+            <input type="text" id="medAlias" placeholder="e.g. My Morning Vitamin">
+            <p class="alias-note">This code name will appear on all reminders instead of the real medication name.</p>
+        </div>
+        <label>Strength / Dosage</label>
+        <input type="text" id="medStrength" placeholder="e.g. 500mg" value="500mg">
+        <label>Reminder Time</label>
+        <input type="time" id="medTime">
+        <button class="btn-primary" onclick="saveMed()">+ Save Medication</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title red">🚨 Emergency Contact (ICE)</div>
+        <p style="font-size:13px; color: var(--muted); margin-bottom: 16px; line-height:1.6;">If 3 doses are missed in a row, you will be prompted to call or text this person.</p>
+        <label class="red">Contact Name</label>
+        <input type="text" id="iceName" placeholder="e.g. Lisa">
+        <label class="red">Phone Number</label>
+        <input type="tel" id="icePhone" placeholder="e.g. +2348012345678">
+        <button class="btn-primary danger" onclick="saveICE()">Save Emergency Contact</button>
+        <div id="iceActiveBadge" class="ice-armed"></div>
+    </div>
+
+    <div class="section-label">Active Regimen</div>
+    <div id="medList"></div>
+
+    <button class="btn-primary ghost" style="margin-top:20px;" onclick="generateReport()">📋 Generate Adherence Report</button>
+    <div id="reportDisplay"></div>
+
+    <div class="footer">MedSidekick v2.0 • Designed by Laurel Omozusi</div>
+</div>
+
+<script>
+const deviceID = localStorage.getItem('msDeviceID') || (() => {
+    const id = 'MS-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    localStorage.setItem('msDeviceID', id);
+    return id;
+})();
+
+let schedule      = JSON.parse(localStorage.getItem('msSchedule'))   || [];
+let totalTaken    = parseInt(localStorage.getItem('msTaken'))        || 0;
+let totalSkipped  = parseInt(localStorage.getItem('msSkipped'))      || 0;
+let currentStreak = parseInt(localStorage.getItem('msStreak'))       || 0;
+let missedConsec  = parseInt(localStorage.getItem('msMissedConsec')) || 0;
+let lastAlertMin  = "";
+let snoozeTimeout = null;
+let alarmActive   = false;
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('introScreen').style.display = 'none';
+        if (localStorage.getItem('msPermGranted')) {
+            showApp();
+        } else {
+            document.getElementById('permissionsScreen').style.display = 'block';
+        }
+    }, 2800);
+});
+
+function acceptPermissions() {
+    localStorage.setItem('msPermGranted', 'true');
+    document.getElementById('permissionsScreen').style.display = 'none';
+    showApp();
+    showToast('Welcome to MedSidekick! 🌟', '#00bfa5');
+}
+
+function showApp() {
+    document.getElementById('mainApp').style.display = 'block';
+    loadAll();
+}
+
+function loadAll() {
+    document.getElementById('patientName').value = localStorage.getItem('msPatient') || '';
+    renderMeds();
+    loadICE();
+    updateScorecard();
+}
+
+function toggleDiscretionMode() {
+    const on = document.getElementById('discretionToggle').checked;
+    document.getElementById('medNameSection').style.display = on ? 'none' : 'block';
+    document.getElementById('aliasDiv').style.display = on ? 'block' : 'none';
+    if (on) document.getElementById('medName').value = '';
+}
+
+function saveMed() {
+    const isDiscreet = document.getElementById('discretionToggle').checked;
+    const realName   = document.getElementById('medName').value.trim();
+    const aliasName  = document.getElementById('medAlias').value.trim();
+    const time       = document.getElementById('medTime').value;
+    const strength   = document.getElementById('medStrength').value.trim() || '500mg';
+    const pName      = document.getElementById('patientName').value.trim() || 'Patient';
+
+    if (!time) return showToast('Please set a reminder time ⏰', '#b71c1c');
+    if (isDiscreet && !aliasName) return showToast('Please enter a masking alias name 🔒', '#b71c1c');
+    if (!isDiscreet && !realName) return showToast('Please enter the medication name 💊', '#b71c1c');
+
+    const displayName = isDiscreet ? aliasName : realName;
+    schedule.push({ name: displayName, strength, time, isDiscreet });
+    persist();
+    localStorage.setItem('msPatient', pName);
+    renderMeds();
+    updateScorecard();
+
+    document.getElementById('medName').value     = '';
+    document.getElementById('medAlias').value    = '';
+    document.getElementById('medStrength').value = '500mg';
+    document.getElementById('medTime').value     = '';
+    document.getElementById('discretionToggle').checked = false;
+    toggleDiscretionMode();
+
+    showToast('Medication saved! 💊', '#00bfa5');
+    safeSpeak('Medication schedule saved for ' + displayName);
+}
+
+function removeMed(i) {
+    schedule.splice(i, 1);
+    persist();
+    renderMeds();
+    updateScorecard();
+    showToast('Medication removed.', '#333');
+}
+
+function renderMeds() {
+    const list = document.getElementById('medList');
+    if (!schedule.length) {
+        list.innerHTML = '<p class="empty-state">No medications scheduled yet.</p>';
+        return;
+    }
+    list.innerHTML = schedule.map((m, i) => `
+        <div class="med-item">
+            <div class="med-item-info">
+                <b>${m.name} <span style="color:var(--muted);font-weight:400;font-size:13px;">(${m.strength})</span></b>
+                <div class="med-meta">${m.isDiscreet ? '🔒 Discreet' : '⏰ Standard'} · ${m.time}</div>
+            </div>
+            <button class="remove-btn" onclick="removeMed(${i})">REMOVE</button>
+        </div>`).join('');
+}
+
+function saveICE() {
+    const name  = document.getElementById('iceName').value.trim();
+    const phone = document.getElementById('icePhone').value.trim();
+    if (!name)  return showToast('Please enter contact name', '#b71c1c');
+    if (!phone) return showToast('Please enter phone number', '#b71c1c');
+    localStorage.setItem('msICE', JSON.stringify({ name, phone }));
+    updateICEBadge(name);
+    showToast('Emergency contact saved! 🛡️', '#c62828');
+}
+
+function loadICE() {
+    const ice = getICE();
+    if (ice) {
+        document.getElementById('iceName').value  = ice.name;
+        document.getElementById('icePhone').value = ice.phone;
+        updateICEBadge(ice.name);
+    }
+}
+
+function updateICEBadge(name) {
+    const b = document.getElementById('iceActiveBadge');
+    b.innerHTML = `🛡️ <strong>Armed:</strong> Emergency contact set to <strong>${name}</strong>`;
+    b.style.display = 'block';
+}
+
+function getICE() { return JSON.parse(localStorage.getItem('msICE')); }
+
+setInterval(() => {
+    if (alarmActive) return;
+    const now  = new Date();
+    const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    if (hhmm === lastAlertMin) return;
+    schedule.forEach(m => {
+        if (m.time === hhmm) {
+            lastAlertMin = hhmm;
+            triggerAlarm(m.name, m.strength, m.isDiscreet);
+        }
+    });
+}, 5000);
+
+function triggerAlarm(name, strength, isDiscreet) {
+    alarmActive = true;
+    const pName = document.getElementById('patientName').value || 'Patient';
+    const box   = document.getElementById('alarmBox');
+    document.getElementById('alarmDetails').textContent = name + ' (' + strength + ')';
+    box.dataset.name     = name;
+    box.dataset.strength = strength;
+    box.dataset.discreet = isDiscreet;
+    box.style.display    = 'block';
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const msg = isDiscreet
+        ? 'Attention ' + pName + ', it is time for your scheduled medication.'
+        : 'Attention ' + pName + ', it is time to take your ' + name + ', ' + strength + '.';
+    safeSpeak(msg);
+}
+
+function snoozeAlarm() {
+    const box = document.getElementById('alarmBox');
+    box.style.display = 'none';
+    alarmActive = false;
+    const name      = box.dataset.name;
+    const strength  = box.dataset.strength;
+    const isDiscreet = box.dataset.discreet === 'true';
+    showToast('Snoozed for 15 minutes ⏱', '#e65100');
+    if (snoozeTimeout) clearTimeout(snoozeTimeout);
+    snoozeTimeout = setTimeout(() => triggerAlarm(name, strength, isDiscreet), 15 * 60 * 1000);
+}
+
+function doseAction(taken) {
+    document.getElementById('alarmBox').style.display = 'none';
+    alarmActive = false;
+    const pName    = document.getElementById('patientName').value || 'Patient';
+    const todayStr = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('msLastStreakDate') || '';
+
+    if (taken) {
+        totalTaken++;
+        missedConsec = 0;
+        if (lastDate !== todayStr) {
+            currentStreak++;
+            localStorage.setItem('msLastStreakDate', todayStr);
+        }
+        showToast('Great job! Dose logged ✅', '#00bfa5');
+        safeSpeak('Well done ' + pName + ', dose logged successfully.');
+    } else {
+        totalSkipped++;
+        missedConsec++;
+        showToast('Dose skipped (' + missedConsec + '/3 before alert)', '#fbc02d');
+        if (missedConsec >= 3) {
+            missedConsec = 0;
+            currentStreak = 0;
+            localStorage.removeItem('msLastStreakDate');
+            triggerICEAlert(pName);
+        }
+    }
+    persist();
+    updateScorecard();
+}
+
+function triggerICEAlert(pName) {
+    const ice = getICE();
+    const msg = ice
+        ? pName + ' has missed 3 doses in a row. Please contact ' + ice.name + ' now.'
+        : pName + ' has missed 3 doses in a row. No emergency contact saved yet.';
+    document.getElementById('iceAlertMsg').textContent = msg;
+    if (ice) {
+        document.getElementById('iceCallBtn').textContent = '📞 Call ' + ice.name;
+        document.getElementById('iceSmsBtn').textContent  = '💬 Text ' + ice.name;
+    }
+    const box = document.getElementById('iceAlertBox');
+    box.style.display = 'block';
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    safeSpeak('Warning. Three doses have been missed. Please contact your emergency contact.');
+}
+
+function iceCall() {
+    const ice = getICE();
+    if (!ice) return showToast('No emergency contact saved!', '#b71c1c');
+    window.location.href = 'tel:' + ice.phone;
+}
+
+function iceSMS() {
+    const ice = getICE();
+    if (!ice) return showToast('No emergency contact saved!', '#b71c1c');
+    const pName = document.getElementById('patientName').value || 'Patient';
+    const msg = 'Hello ' + ice.name + ', this is a care alert from MedSidekick. ' + pName + ' has missed 3 consecutive medication doses. Could you please check in on them? Thank you for being their support. ❤️';
+    window.location.href = 'sms:' + ice.phone + '?body=' + encodeURIComponent(msg);
+}
+
+function dismissICE() {
+    document.getElementById('iceAlertBox').style.display = 'none';
+}
+
+function updateScorecard() {
+    const total = totalTaken + totalSkipped;
+    const pct   = total === 0 ? 100 : Math.round((totalTaken / total) * 100);
+    document.getElementById('statCompliance').textContent = total === 0 ? '—' : pct + '%';
+    document.getElementById('statStreak').textContent = currentStreak + ' days';
+    const badge = document.getElementById('badgeRank');
+    badge.className = 'score-badge';
+    if (total === 0) { badge.textContent = '🆕 Getting Started'; }
+    else if (pct >= 90 && totalTaken >= 15) { badge.textContent = '🥇 Gold Elite Guardian'; badge.classList.add('gold-badge'); }
+    else if (pct >= 75 && totalTaken >= 7)  { badge.textContent = '🥈 Silver Mastery'; badge.classList.add('silver-badge'); }
+    else if (totalTaken >= 3)               { badge.textContent = '🥉 Bronze Shield'; badge.classList.add('bronze-badge'); }
+}
+
+function generateReport() {
+    const pName = document.getElementById('patientName').value || 'Patient';
+    const total = totalTaken + totalSkipped;
+    const pct   = total === 0 ? 100 : Math.round((totalTaken / total) * 100);
+    const color = pct >= 85 ? '#00bfa5' : '#ffb74d';
+    let regRows = schedule.length
+        ? schedule.map(m => `<div class="report-row"><span><b>${m.name}</b> <span style="color:var(--muted)">(${m.strength})</span></span><span style="color:var(--teal);font-size:12px;">${m.time} · ${m.isDiscreet ? '🔒' : '⏰'}</span></div>`).join('')
+        : '<p style="color:var(--muted);font-style:italic;font-size:13px;padding:8px 0;">No active medications.</p>';
+    const d = document.getElementById('reportDisplay');
+    d.innerHTML = `
+        <div class="report-header"><h3>MEDSIDEKICK ADHERENCE REPORT</h3><small>Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</small></div>
+        <div class="report-row"><span>Patient</span><b style="color:var(--teal)">${pName}</b></div>
+        <div class="report-row"><span>Device ID</span><span style="font-family:monospace;color:var(--muted);font-size:12px;">${deviceID}</span></div>
+        <div class="report-section">Performance Metrics</div>
+        <div class="report-row"><span>Compliance Rate</span><b style="color:${color}">${pct}%</b></div>
+        <div class="report-row"><span>Doses Taken</span><span>${totalTaken}</span></div>
+        <div class="report-row"><span>Doses Missed</span><span>${totalSkipped}</span></div>
+        <div class="report-row"><span>Current Streak</span><span style="color:var(--gold)">${currentStreak} days</span></div>
+        <div class="report-section">Active Medications</div>
+        ${regRows}
+        <p class="report-note">Data stored locally on device. MedSidekick v2.0</p>`;
+    d.style.display = d.style.display === 'block' ? 'none' : 'block';
+}
+
+function persist() {
+    localStorage.setItem('msSchedule',     JSON.stringify(schedule));
+    localStorage.setItem('msTaken',        totalTaken);
+    localStorage.setItem('msSkipped',      totalSkipped);
+    localStorage.setItem('msStreak',       currentStreak);
+    localStorage.setItem('msMissedConsec', missedConsec);
+}
+
+function safeSpeak(text) {
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang   = 'en-GB';
+        u.rate   = 0.9;
+        u.pitch  = 1.0;
+        u.volume = 1.0;
+        window.speechSynthesis.speak(u);
+    } catch(e) {}
+}
+
+function showToast(msg, bg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    t.style.background = bg || '#00bfa5';
+    t.style.color = 'white';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function debugForceAlarm() {
+    const m = schedule[0] || { name: 'Demo Medication', strength: '500mg', isDiscreet: false };
+    triggerAlarm(m.name, m.strength, m.isDiscreet);
+    showToast('Test alarm triggered! ⚡', '#fbc02d');
+}
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
 </body>
 </html>
