@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MedSidekick</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/Medsidekick/manifest.json">
     <meta name="theme-color" content="#00bfa5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -408,8 +408,8 @@ function snoozeAlarm() {
     const box = document.getElementById('alarmBox');
     box.style.display = 'none';
     alarmActive = false;
-    const name      = box.dataset.name;
-    const strength  = box.dataset.strength;
+    const name       = box.dataset.name;
+    const strength   = box.dataset.strength;
     const isDiscreet = box.dataset.discreet === 'true';
     showToast('Snoozed for 15 minutes ⏱', '#e65100');
     if (snoozeTimeout) clearTimeout(snoozeTimeout);
@@ -555,7 +555,7 @@ function debugForceAlarm() {
 }
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/Medsidekick/sw.js').catch(() => {});
 }
 </script>
 </body>
