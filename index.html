@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MedSidekick</title>
-    <link rel="manifest" href="/Medsidekick/manifest.json">
+    <!-- CORRECTION: Relative pathing for universal compatibility with PWABuilder and offline APK frameworks -->
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#00bfa5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -242,6 +243,13 @@
 </div>
 
 <script>
+// XSS Security Sanitization Patch: Secures runtime rendering logic against execution injection
+function cleanHTML(str) {
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
+}
+
 const deviceID = localStorage.getItem('msDeviceID') || (() => {
     const id = 'MS-' + Math.random().toString(36).substring(2,8).toUpperCase();
     localStorage.setItem('msDeviceID', id);
@@ -341,8 +349,8 @@ function renderMeds() {
     list.innerHTML = schedule.map((m, i) => `
         <div class="med-item">
             <div class="med-item-info">
-                <b>${m.name} <span style="color:var(--muted);font-weight:400;font-size:13px;">(${m.strength})</span></b>
-                <div class="med-meta">${m.isDiscreet ? '🔒 Discreet' : '⏰ Standard'} · ${m.time}</div>
+                <b>${cleanHTML(m.name)} <span style="color:var(--muted);font-weight:400;font-size:13px;">(${cleanHTML(m.strength)})</span></b>
+                <div class="med-meta">${m.isDiscreet ? '🔒 Discreet' : '⏰ Standard'} · ${cleanHTML(m.time)}</div>
             </div>
             <button class="remove-btn" onclick="removeMed(${i})">REMOVE</button>
         </div>`).join('');
@@ -369,7 +377,7 @@ function loadICE() {
 
 function updateICEBadge(name) {
     const b = document.getElementById('iceActiveBadge');
-    b.innerHTML = `🛡️ <strong>Armed:</strong> Emergency contact set to <strong>${name}</strong>`;
+    b.innerHTML = `🛡️ <strong>Armed:</strong> Emergency contact set to <strong>${cleanHTML(name)}</strong>`;
     b.style.display = 'block';
 }
 
@@ -500,13 +508,13 @@ function generateReport() {
     const pct   = total === 0 ? 100 : Math.round((totalTaken / total) * 100);
     const color = pct >= 85 ? '#00bfa5' : '#ffb74d';
     let regRows = schedule.length
-        ? schedule.map(m => `<div class="report-row"><span><b>${m.name}</b> <span style="color:var(--muted)">(${m.strength})</span></span><span style="color:var(--teal);font-size:12px;">${m.time} · ${m.isDiscreet ? '🔒' : '⏰'}</span></div>`).join('')
+        ? schedule.map(m => `<div class="report-row"><span><b>${cleanHTML(m.name)}</b> <span style="color:var(--muted)">(${cleanHTML(m.strength)})</span></span><span style="color:var(--teal);font-size:12px;">${cleanHTML(m.time)} · ${m.isDiscreet ? '🔒' : '⏰'}</span></div>`).join('')
         : '<p style="color:var(--muted);font-style:italic;font-size:13px;padding:8px 0;">No active medications.</p>';
     const d = document.getElementById('reportDisplay');
     d.innerHTML = `
         <div class="report-header"><h3>MEDSIDEKICK ADHERENCE REPORT</h3><small>Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</small></div>
-        <div class="report-row"><span>Patient</span><b style="color:var(--teal)">${pName}</b></div>
-        <div class="report-row"><span>Device ID</span><span style="font-family:monospace;color:var(--muted);font-size:12px;">${deviceID}</span></div>
+        <div class="report-row"><span>Patient</span><b style="color:var(--teal)">${cleanHTML(pName)}</b></div>
+        <div class="report-row"><span>Device ID</span><span style="font-family:monospace;color:var(--muted);font-size:12px;">${cleanHTML(deviceID)}</span></div>
         <div class="report-section">Performance Metrics</div>
         <div class="report-row"><span>Compliance Rate</span><b style="color:${color}">${pct}%</b></div>
         <div class="report-row"><span>Doses Taken</span><span>${totalTaken}</span></div>
@@ -528,14 +536,16 @@ function persist() {
 
 function safeSpeak(text) {
     try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang   = 'en-GB';
-        u.rate   = 0.9;
-        u.pitch  = 1.0;
-        u.volume = 1.0;
-        window.speechSynthesis.speak(u);
-    } catch(e) {}
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang   = 'en-GB';
+            u.rate   = 0.9;
+            u.pitch  = 1.0;
+            u.volume = 1.0;
+            window.speechSynthesis.speak(u);
+        }
+    } catch(e) { console.warn("TTS initialization failed or was blocked by host container permissions."); }
 }
 
 function showToast(msg, bg) {
@@ -554,8 +564,9 @@ function debugForceAlarm() {
     showToast('Test alarm triggered! ⚡', '#fbc02d');
 }
 
+// CORRECTION: Re-routed pathing using true relative pointers to keep the service worker tracking flawlessly inside your APK wrapper build
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/Medsidekick/sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>
 </body>
