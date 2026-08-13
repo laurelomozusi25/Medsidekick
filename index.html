@@ -83,7 +83,7 @@
         .stat-group .label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-group .value { font-size: 38px; font-weight: 800; color: var(--primary); line-height: 1; }
         .streak-group { text-align: right; border-left: 1px solid var(--border); padding-left: 20px; }
-        .streak-group .value { font-size: 24px; color: var(--success); }
+        .streak-group .value { font-size: 24px; color: var(--primary); }
 
         /* ALERTS */
         .alert-box { display: none; border-radius: 20px; padding: 24px; margin-bottom: 24px; text-align: center; border: 2px solid var(--warning); background: #FFFBEB; box-shadow: var(--shadow); }
@@ -278,7 +278,7 @@
                 <div class="input-group">
                     <input type="tel" id="icePhone" placeholder="Phone Number">
                 </div>
-                <button class="btn-primary" style="background:var(--text-main);" onclick="saveICE()">Add Contact</button>
+                <button class="btn-primary" onclick="saveICE()">Add Contact</button>
             </div>
         </div>
     </div>
@@ -301,9 +301,11 @@
                 </div>
                 <div style="display:flex; gap:16px;">
                     <div class="input-group" style="flex:1;">
+                        <label>Date</label>
                         <input type="date" id="aptDate">
                     </div>
                     <div class="input-group" style="flex:1;">
+                        <label>Time</label>
                         <input type="time" id="aptTime">
                     </div>
                 </div>
@@ -817,7 +819,6 @@ function generateReport() {
     const localSkipped = filteredHistory.filter(l => l.status === 'skipped').length;
     const localTotal = localTaken + localSkipped;
     const pct = localTotal === 0 ? 100 : Math.round((localTaken / localTotal) * 100);
-    const color = pct >= 85 ? 'var(--success)' : 'var(--warning)';
     
     const recentLogs = [...filteredHistory].reverse().slice(0, 25);
     let historyHtml = recentLogs.length > 0 
@@ -843,8 +844,8 @@ function generateReport() {
         </div>
         <div class="report-row"><span>Patient Name</span><strong style="color:var(--text-main); font-size:15px;">${cleanHTML(pName)}</strong></div>
         <div class="report-row"><span>Report Period</span><strong style="color:var(--text-main)">${timeframeLabel}</strong></div>
-        <div class="report-row"><span>Compliance Rate</span><strong style="color:${color};font-size:20px;">${pct}%</strong></div>
-        <div class="report-row"><span>Doses Verified</span><strong style="color:var(--success); font-size:16px;">${localTaken}</strong></div>
+        <div class="report-row"><span>Compliance Rate</span><strong style="color:var(--primary);font-size:20px;">${pct}%</strong></div>
+        <div class="report-row"><span>Doses Verified</span><strong style="color:var(--primary); font-size:16px;">${localTaken}</strong></div>
         <div class="report-row"><span>Doses Missed</span><strong style="color:var(--danger); font-size:16px;">${localSkipped}</strong></div>
         ${aptHtml}
         
@@ -853,7 +854,7 @@ function generateReport() {
         
         <div style="font-size:11px; text-align:center; color:var(--text-muted); margin-top:32px; padding-top:20px; border-top:1px dashed var(--border); line-height: 1.6;">
             <strong>MedSidekick 3.0 Designed by Laurel Omozusi</strong><br>
-            Device ID: ${cleanHTML(deviceID)}<br>Strictly Offline Local Storage
+            Device ID: ${cleanHTML(deviceID)}
         </div>`;
 }
 
@@ -876,3 +877,4 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 </script>
 </body>
 </html>
+
