@@ -154,7 +154,7 @@
 <div id="permissionsScreen">
     <div class="perm-card">
         <h2>Secure Local Setup</h2>
-        <p>MedSidekick operates entirely offline. Click below to securely initialize your profile and enable audio reminders.</p>
+        <p>Click below to securely initialize your profile and enable audio reminders.</p>
         <button class="btn-primary" onclick="acceptPermissions()">
             <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Initialize Secure Profile
@@ -649,11 +649,17 @@ function renderAppointment() {
 
 function checkAptReminders() {
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
     
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const tYear = tomorrow.getFullYear();
+    const tMonth = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const tDay = String(tomorrow.getDate()).padStart(2, '0');
+    const tomorrowStr = `${tYear}-${tMonth}-${tDay}`;
 
     let alerts = [];
     appointments.forEach(apt => {
@@ -677,20 +683,63 @@ function checkAptReminders() {
 
 function dismissAptAlert() {
     document.getElementById('aptAlertBox').style.display = 'none';
+    alarmActive = false;
 }
 
 setInterval(() => {
     if (alarmActive) return;
     const now  = new Date();
     const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+
     if (hhmm === lastAlertMin) return;
+    
+    let triggered = false;
+
+    // Trigger Medication Alarms
     schedule.forEach(m => {
         if (m.time === hhmm) {
-            lastAlertMin = hhmm;
+            triggered = true;
             triggerAlarm(m.name, m.strength, m.isDiscreet);
         }
     });
+
+    // Trigger Live Appointment Alarms
+    appointments.forEach(apt => {
+        if (apt.date === todayStr && apt.time === hhmm) {
+            triggered = true;
+            triggerAptVoice(apt.name);
+        }
+    });
+
+    if (triggered) lastAlertMin = hhmm;
 }, 5000);
+
+function triggerAptVoice(doctorName) {
+    alarmActive = true;
+    const box = document.getElementById('aptAlertBox');
+    document.getElementById('aptAlertMsg').innerHTML = `🚨 <strong style="color:var(--danger);">IT IS TIME:</strong> You have an appointment with ${cleanHTML(doctorName)} right now!`;
+    box.style.display = 'block';
+    
+    const pName = document.getElementById('patientName').value || 'Patient';
+
+    try {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(`Hi ${pName}, this is a reminder for your scheduled clinic appointment with ${doctorName}.`);
+            u.volume = 1.0;
+            u.rate = 0.95; 
+            window.speechSynthesis.speak(u);
+        }
+    } catch(e) { console.error(e); }
+
+    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
 function triggerAlarm(name, strength, isDiscreet) {
     alarmActive = true;
@@ -877,4 +926,3 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 </script>
 </body>
 </html>
-
