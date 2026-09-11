@@ -3,6 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch: # This allows you to click a button to run it manually
 
 jobs:
   build:
@@ -13,30 +14,37 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Setup Java 17 for Android
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Web App
-        run: npm run build 
-
-      - name: Install Capacitor
+      - name: Prepare Web Directory
         run: |
-          npm install @capacitor/core @capacitor/cli
+          mkdir www
+          rsync -av --exclude='www' --exclude='.git' --exclude='.github' ./ www/
+
+      - name: Initialize Project & Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/local-notifications
           npm install @capacitor/android
-          npx cap init MedSidekick com.medsidekick.app --web-dir dist 
+          npx cap init MedSidekick com.medsidekick.app --web-dir www
           npx cap add android
-          npx cap copy
 
       - name: Build Android APK
         working-directory: ./android
-        run: ./gradlew assembleDebug 
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      - name: Upload APK for Download
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: medsidekick-app
