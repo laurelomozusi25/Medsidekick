@@ -16,11 +16,13 @@
         :root {
             --primary: #0072FF; 
             --secondary: #00C6FF;
+            --primary-light: #EFF5FF;
             --accent: #0056b3;
             --success: #34c759;
             --danger: #ff3b30;
             --danger-light: #fff0f0;
             --warning: #ff9500;
+            --warning-light: #fff9e6;
             --surface: #ffffff;
             --border: #e5e5ea;
             --text-main: #1d1d1f;
@@ -35,7 +37,7 @@
             background-attachment: fixed;
             color: var(--text-main); 
             min-height: 100vh; 
-            padding-bottom: 90px; 
+            padding-bottom: 95px; 
             font-size: 15px; 
             -webkit-font-smoothing: antialiased; 
         }
@@ -43,7 +45,6 @@
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
         .icon-sm { width: 18px; height: 18px; }
 
-        /* PURE WHITE INTRO SCREEN WITH BLUE TYPOGRAPHY */
         #introScreen { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; transition: opacity 0.6s ease; }
         .intro-logo { font-size: 32px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; opacity: 0; animation: disneyScale 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .intro-sub { font-size: 13px; color: var(--primary); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; opacity: 0; animation: fadeUp 1s ease 0.6s forwards; }
@@ -57,14 +58,12 @@
             to { opacity: 1; transform: none; } 
         }
 
-        /* PERMISSIONS SCREEN */
         #permissionsScreen { display: none; position: fixed; inset: 0; background: var(--surface); z-index: 9998; padding: 24px; overflow-y: auto; }
         .perm-card { max-width: 400px; margin: 60px auto; background: var(--surface); border-radius: 24px; padding: 32px 24px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
         .perm-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; color: var(--primary); }
         .perm-card p { color: var(--text-muted); font-size: 15px; line-height: 1.5; margin-bottom: 24px; }
         .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3); transition: transform 0.1s; }
         
-        /* MAIN APP */
         #mainApp { display: none; max-width: 480px; margin: 0 auto; padding: 0 16px; opacity: 0; transition: opacity 0.5s ease; }
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; margin-bottom: 10px; color: white; }
         .app-header h1 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -73,19 +72,16 @@
         .view-section { display: none; animation: fadeIn 0.3s ease; }
         .view-section.active { display: block; }
 
-        /* CARDS */
         .card { background: var(--surface); border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
         .section-header { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .live-datetime { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px dashed var(--border); display: flex; align-items: center; gap: 6px; }
 
-        /* SCORECARD */
         .scorecard { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); }
         .stat-group .label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-group .value { font-size: 38px; font-weight: 800; color: var(--primary); line-height: 1; }
         .streak-group { text-align: right; border-left: 1px solid var(--border); padding-left: 20px; }
         .streak-group .value { font-size: 24px; color: var(--primary); }
 
-        /* ALERTS */
         .alert-box { display: none; border-radius: 20px; padding: 24px; margin-bottom: 24px; text-align: center; border: 2px solid var(--warning); background: #FFFBEB; box-shadow: var(--shadow); }
         #alarmDetails { font-size: 22px; font-weight: 800; margin: 12px 0 24px; color: var(--text-main); }
         
@@ -103,13 +99,12 @@
         
         .ice-action-btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; margin-bottom: 10px; width: 100%; display: flex; justify-content: center; gap: 8px; align-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        /* FORMS */
         .input-group { margin-bottom: 16px; }
         .input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-        input[type="text"], input[type="time"], input[type="date"], input[type="tel"], select { width: 100%; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 16px; color: var(--text-main); font-weight: 500; outline: none; transition: border-color 0.2s; }
+        input[type="text"], input[type="number"], input[type="time"], input[type="date"], input[type="tel"], select { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 16px; color: var(--text-main); font-weight: 500; outline: none; transition: border-color 0.2s; }
         input:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.1); }
 
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
         .switch { position: relative; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; inset: 0; background: #CBD5E1; border-radius: 34px; cursor: pointer; transition: 0.3s; }
@@ -117,24 +112,34 @@
         input:checked + .slider { background: var(--primary); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* LIST ITEMS */
-        .list-item { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .list-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .list-info { display: flex; align-items: center; gap: 14px; }
         .med-icon-circle { width: 44px; height: 44px; border-radius: 50%; background: #E0F2FE; color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .list-info b { display: block; font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
         .list-info span { font-size: 13px; color: var(--text-muted); font-weight: 600; }
         .remove-btn { background: var(--surface); color: var(--danger); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* REPORTS */
+        /* REFILL CARD STYLES */
+        .refill-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .refill-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .refill-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .refill-badge.ok { background: #E8F5E9; color: var(--success); }
+        .refill-badge.low { background: var(--warning-light); color: var(--warning); }
+        .refill-badge.critical { background: var(--danger-light); color: var(--danger); }
+        .progress-bar { height: 8px; width: 100%; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin: 10px 0 14px; }
+        .progress-fill { height: 100%; border-radius: 10px; transition: width 0.3s; }
+        .refill-actions { display: flex; gap: 10px; }
+        .refill-btn-sm { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
         .report-header { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
         .report-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; font-weight: 600; }
         .report-row span:first-child { color: var(--text-muted); }
         .history-log-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom: 1px solid var(--border); }
         .history-log-item:last-child { border-bottom: none; }
         
-        /* BOTTOM NAV */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); z-index: 9000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
-        .nav-item { background: none; border: none; font-family: inherit; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 25%; transition: color 0.2s; }
+        /* 5-ITEM BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 6px calc(10px + env(safe-area-inset-bottom)); z-index: 9000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .nav-item { background: none; border: none; font-family: inherit; font-size: 10.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; width: 20%; transition: color 0.2s; }
         .nav-item.active { color: var(--primary); }
         
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: white; padding: 14px 24px; border-radius: 30px; z-index: 10000; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow); animation: toastIn 0.3s ease; }
@@ -171,8 +176,8 @@
         <div class="header-avatar" id="userInitial">P</div>
     </div>
 
+    <!-- SCREEN 1: HOME -->
     <div id="view-home" class="view-section active">
-        
         <div class="scorecard">
             <div class="stat-group">
                 <div class="label">Adherence</div>
@@ -223,6 +228,7 @@
         </div>
     </div>
 
+    <!-- SCREEN 2: SCHEDULE (ADD MEDS) -->
     <div id="view-meds" class="view-section">
         <div class="card">
             <div class="section-header">Add Medication</div>
@@ -259,6 +265,19 @@
                     <input type="time" id="medTime">
                 </div>
             </div>
+
+            <!-- Optional Initial Supply Count -->
+            <div style="display:flex; gap:16px;">
+                <div class="input-group" style="flex:1;">
+                    <label>Pills/Units in Pack</label>
+                    <input type="number" id="medInitialUnits" placeholder="e.g. 30" min="1">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>Alert Threshold</label>
+                    <input type="number" id="medThreshold" placeholder="e.g. 7" min="1" value="7">
+                </div>
+            </div>
+
             <button class="btn-primary" onclick="saveMed()">Save to Regimen</button>
         </div>
 
@@ -283,6 +302,7 @@
         </div>
     </div>
 
+    <!-- SCREEN 3: CLINIC FOLLOW-UPS -->
     <div id="view-appointments" class="view-section">
         <div class="card">
             <div class="section-header" style="color: var(--primary);">
@@ -314,6 +334,43 @@
         </div>
     </div>
 
+    <!-- SCREEN 4: DEDICATED REFILL TRACKER (NEW SCREEN) -->
+    <div id="view-refills" class="view-section">
+        <div class="card">
+            <div class="section-header" style="color: var(--primary);">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Medication Inventory
+            </div>
+            <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+                Track your active pill stock offline. Doses marked "Taken" automatically decrement your pack count.
+            </p>
+
+            <div id="refillOverviewList"></div>
+        </div>
+
+        <div class="card">
+            <div class="section-header">Update Inventory / Pack</div>
+            <div class="input-group">
+                <label>Select Medication</label>
+                <select id="refillMedSelect"></select>
+            </div>
+
+            <div style="display:flex; gap:16px;">
+                <div class="input-group" style="flex:1;">
+                    <label>Current Units</label>
+                    <input type="number" id="refillTotalUnits" placeholder="e.g. 30" min="0">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>Warning Level</label>
+                    <input type="number" id="refillWarningThreshold" placeholder="e.g. 7" min="1" value="7">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="saveOrUpdateRefill()">Update Stock</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: REPORTS -->
     <div id="view-reports" class="view-section">
         <div class="card" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
             <div class="input-group" style="margin-bottom:0;">
@@ -326,12 +383,12 @@
             </div>
         </div>
 
-        <div class="card" id="reportDisplay" style="padding: 28px;">
-            </div>
+        <div class="card" id="reportDisplay" style="padding: 28px;"></div>
     </div>
 
 </div>
 
+<!-- 5-BUTTON NAVIGATION -->
 <nav class="bottom-nav" id="bottomNav" style="display: none;">
     <button class="nav-item active" onclick="switchTab('home', this)">
         <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -344,6 +401,10 @@
     <button class="nav-item" onclick="switchTab('appointments', this)">
         <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Follow-up
+    </button>
+    <button class="nav-item" onclick="switchTab('refills', this)">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Refills
     </button>
     <button class="nav-item" onclick="switchTab('reports', this)">
         <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -370,12 +431,13 @@ const deviceID = localStorage.getItem('msDeviceID') || (() => {
     localStorage.setItem('msDeviceID', id); return id;
 })();
 
-let schedule      = JSON.parse(localStorage.getItem('msSchedule'))   || [];
-let doseHistory   = JSON.parse(localStorage.getItem('msDoseHistory')) || [];
-let iceContacts   = JSON.parse(localStorage.getItem('msICEContacts')) || [];
+let schedule      = JSON.parse(localStorage.getItem('msSchedule'))    || [];
+let doseHistory   = JSON.parse(localStorage.getItem('msDoseHistory'))  || [];
+let iceContacts   = JSON.parse(localStorage.getItem('msICEContacts'))  || [];
 let appointments  = JSON.parse(localStorage.getItem('msAppointments')) || [];
-let currentStreak = parseInt(localStorage.getItem('msStreak'))       || 0;
-let missedConsec  = parseInt(localStorage.getItem('msMissedConsec')) || 0;
+let refillStock   = JSON.parse(localStorage.getItem('msRefills'))      || {}; // Format: { "Med Name": { units: 30, maxUnits: 30, threshold: 7 } }
+let currentStreak = parseInt(localStorage.getItem('msStreak'))        || 0;
+let missedConsec  = parseInt(localStorage.getItem('msMissedConsec'))  || 0;
 let lastAlertMin  = "";
 let snoozeTimeout = null;
 let alarmActive   = false;
@@ -419,24 +481,22 @@ function switchTab(tabName, btnElement) {
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     document.getElementById('view-' + tabName).classList.add('active');
     btnElement.classList.add('active');
-    if(tabName === 'reports') generateReport();
-    if(tabName === 'appointments') renderAppointment();
+    if (tabName === 'reports') generateReport();
+    if (tabName === 'appointments') renderAppointment();
+    if (tabName === 'refills') renderRefillScreen();
 }
 
 function loadAll() {
     const pName = localStorage.getItem('msPatient') || '';
     document.getElementById('patientName').value = pName;
-    if(pName) document.getElementById('userInitial').innerText = pName.charAt(0).toUpperCase();
-    
-    if(localStorage.getItem('msAppointment')) {
-        localStorage.removeItem('msAppointment');
-    }
+    if (pName) document.getElementById('userInitial').innerText = pName.charAt(0).toUpperCase();
     
     renderMeds();
     renderICE();
     updateScorecard();
     renderAppointment();
     checkAptReminders();
+    renderRefillScreen();
 }
 
 function toggleDiscretionMode() {
@@ -457,6 +517,8 @@ function saveMed() {
     const time       = document.getElementById('medTime').value;
     const strength   = document.getElementById('medStrength').value.trim() || '500mg';
     const pName      = document.getElementById('patientName').value.trim() || 'Patient';
+    const units      = parseInt(document.getElementById('medInitialUnits').value) || 30;
+    const threshold  = parseInt(document.getElementById('medThreshold').value) || 7;
 
     if (!time) return showToast('Set a reminder time', 'var(--danger)');
     if (isDiscreet && !aliasName) return showToast('Enter a masking alias', 'var(--danger)');
@@ -464,16 +526,28 @@ function saveMed() {
 
     const displayName = isDiscreet ? aliasName : realName;
     schedule.push({ name: displayName, strength, time, isDiscreet });
+    
+    // Initialize or register in refill tracking
+    if (!refillStock[displayName]) {
+        refillStock[displayName] = {
+            units: units,
+            maxUnits: units,
+            threshold: threshold
+        };
+    }
+
     persist();
     localStorage.setItem('msPatient', pName);
     document.getElementById('userInitial').innerText = pName.charAt(0).toUpperCase();
     
     renderMeds();
     updateScorecard();
+    renderRefillScreen();
 
     document.getElementById('medName').value = 'Paracetamol';
     document.getElementById('medAlias').value = '';
     document.getElementById('medTime').value = '';
+    document.getElementById('medInitialUnits').value = '';
     document.getElementById('discretionToggle').checked = false;
     toggleDiscretionMode();
 
@@ -482,8 +556,12 @@ function saveMed() {
 }
 
 function removeMed(i) {
+    const item = schedule[i];
+    if (item && refillStock[item.name]) {
+        delete refillStock[item.name];
+    }
     schedule.splice(i, 1);
-    persist(); renderMeds(); updateScorecard();
+    persist(); renderMeds(); updateScorecard(); renderRefillScreen();
     showToast('Medication removed', 'var(--text-muted)');
 }
 
@@ -511,6 +589,109 @@ function renderMeds() {
                 <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>`).join('');
+}
+
+/* REFILL SYSTEM ENGINE */
+function renderRefillScreen() {
+    const container = document.getElementById('refillOverviewList');
+    const selectBox = document.getElementById('refillMedSelect');
+    const names = Object.keys(refillStock);
+
+    if (names.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:14px;">No medications to track. Add your medications in Schedule first.</div>';
+        selectBox.innerHTML = '<option value="">No Meds Available</option>';
+        return;
+    }
+
+    selectBox.innerHTML = names.map(n => `<option value="${cleanHTML(n)}">${cleanHTML(n)}</option>`).join('');
+
+    container.innerHTML = names.map(name => {
+        const item = refillStock[name];
+        const pct = Math.max(0, Math.min(100, Math.round((item.units / item.maxUnits) * 100)));
+        let badgeClass = 'ok';
+        let badgeText = `${item.units} Units Left`;
+        let barColor = 'var(--primary)';
+
+        if (item.units <= 0) {
+            badgeClass = 'critical';
+            badgeText = 'DEPLETED - REFILL NOW';
+            barColor = 'var(--danger)';
+        } else if (item.units <= item.threshold) {
+            badgeClass = 'low';
+            badgeText = `LOW STOCK (${item.units} left)`;
+            barColor = 'var(--warning)';
+        }
+
+        return `
+        <div class="refill-card">
+            <div class="refill-header">
+                <div>
+                    <strong style="font-size:16px; color:var(--text-main);">${cleanHTML(name)}</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Threshold alert at: ${item.threshold} pills</div>
+                </div>
+                <span class="refill-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${pct}%; background: ${barColor};"></div>
+            </div>
+            <div class="refill-actions">
+                <button class="refill-btn-sm" onclick="quickDeductUnit('${name}')">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg> Log Unit Taken
+                </button>
+                <button class="refill-btn-sm" style="color:var(--primary);" onclick="quickRestockPrompt('${name}')">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> + Restock Pack
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function quickDeductUnit(name) {
+    if (!refillStock[name]) return;
+    if (refillStock[name].units > 0) {
+        refillStock[name].units -= 1;
+        persist();
+        renderRefillScreen();
+        if (refillStock[name].units <= refillStock[name].threshold) {
+            showToast(`Refill Alert: ${name} is running low!`, 'var(--warning)');
+        } else {
+            showToast(`1 unit logged for ${name}`, 'var(--success)');
+        }
+    }
+}
+
+function quickRestockPrompt(name) {
+    const qty = prompt(`How many units are you adding to your ${name} pack?`, "30");
+    const num = parseInt(qty);
+    if (!isNaN(num) && num > 0) {
+        refillStock[name].units += num;
+        if (refillStock[name].units > refillStock[name].maxUnits) {
+            refillStock[name].maxUnits = refillStock[name].units;
+        }
+        persist();
+        renderRefillScreen();
+        showToast(`Stock updated (+${num})`, 'var(--success)');
+    }
+}
+
+function saveOrUpdateRefill() {
+    const medName = document.getElementById('refillMedSelect').value;
+    const totalUnits = parseInt(document.getElementById('refillTotalUnits').value);
+    const threshold = parseInt(document.getElementById('refillWarningThreshold').value) || 7;
+
+    if (!medName) return showToast('No medication selected', 'var(--danger)');
+    if (isNaN(totalUnits) || totalUnits < 0) return showToast('Enter valid units count', 'var(--danger)');
+
+    refillStock[medName] = {
+        units: totalUnits,
+        maxUnits: totalUnits,
+        threshold: threshold
+    };
+
+    persist();
+    renderRefillScreen();
+    document.getElementById('refillTotalUnits').value = '';
+    showToast(`Inventory updated for ${medName}`, 'var(--success)');
 }
 
 function saveICE() {
@@ -700,7 +881,6 @@ setInterval(() => {
     
     let triggered = false;
 
-    // Trigger Medication Alarms
     schedule.forEach(m => {
         if (m.time === hhmm) {
             triggered = true;
@@ -708,7 +888,6 @@ setInterval(() => {
         }
     });
 
-    // Trigger Live Appointment Alarms
     appointments.forEach(apt => {
         if (apt.date === todayStr && apt.time === hhmm) {
             triggered = true;
@@ -797,7 +976,18 @@ function doseAction(taken) {
     if (taken) {
         missedConsec = 0;
         if (lastDate !== todayStr) { currentStreak++; localStorage.setItem('msLastStreakDate', todayStr); }
-        showToast('Dose Verified', 'var(--success)');
+        
+        // Automatic Inventory Decrement
+        if (refillStock[medName] && refillStock[medName].units > 0) {
+            refillStock[medName].units -= 1;
+            if (refillStock[medName].units <= refillStock[medName].threshold) {
+                showToast(`Refill Warning: ${medName} has ${refillStock[medName].units} left!`, 'var(--warning)');
+            } else {
+                showToast('Dose Verified', 'var(--success)');
+            }
+        } else {
+            showToast('Dose Verified', 'var(--success)');
+        }
     } else {
         missedConsec++;
         showToast(`Missed (${missedConsec}/3 before ICE alert)`, 'var(--warning)');
@@ -809,6 +999,7 @@ function doseAction(taken) {
     
     persist(); 
     updateScorecard();
+    renderRefillScreen();
     if(document.getElementById('view-reports').classList.contains('active')) generateReport();
 }
 
@@ -912,6 +1103,7 @@ function persist() {
     localStorage.setItem('msDoseHistory', JSON.stringify(doseHistory));
     localStorage.setItem('msICEContacts', JSON.stringify(iceContacts));
     localStorage.setItem('msAppointments', JSON.stringify(appointments));
+    localStorage.setItem('msRefills', JSON.stringify(refillStock));
     localStorage.setItem('msStreak', currentStreak);
     localStorage.setItem('msMissedConsec', missedConsec);
 }
